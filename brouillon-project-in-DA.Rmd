@@ -1,0 +1,194 @@
+---
+title: "Brouillon-project-in-ADA"
+author: "Elodie Kwan"
+date: '2022-04-14'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import libraries and data 
+
+Download libraries and set the working directory
+```{r}
+# library(here)
+library(dplyr)
+library(Hmisc)
+library(DataExplorer)
+library(psych)
+library(rpart)
+
+```
+
+Import data 
+```{r}
+German_credit <- read.csv("./Data_DA/GermanCredit.csv", header = TRUE, sep = ";")
+```
+
+## Get to know the data 
+
+### Title : german credit data 
+### Name of the file : GermanCredit.cvs
+### Abstract 
+The German Credit data has data on 1000 past credit applicants, described by 30 variables. Each applicant is rated as "Good" or "Bad" credit (encoded as 1 and 0 respectively in the response variable). 
+**Goal** : We want to obtain a model that may be used to determine if new applicants present a good or bad credit risk
+
++ Number of instances : 1000
++ Number of attributes : 30
++ Attribute Information :
+
+```{r}
+head(German_credit, 10)
+summary(German_credit)
+str(German_credit)
+which(is.na(German_credit))
+```
+ 
+ + There are no missing values. 
+ + The response variable is the '**Response**' variable - last column on the data. 
+ 
+Response variable : credit rating is good
+1. 0 : No
+2. 1 : Yes
+
+
+Make sure that the class of the variables are correct : 
+
+```{r}
+
+German_credit$DURATION <- as.numeric(German_credit$DURATION)
+German_credit$AMOUNT <- as.numeric(German_credit$AMOUNT)
+German_credit$INSTALL_RATE <- as.numeric(German_credit$INSTALL_RATE)
+German_credit$AGE <- as.numeric(German_credit$AGE)
+German_credit$NUM_CREDITS <- as.numeric(German_credit$NUM_CREDITS)
+German_credit$NUM_DEPENDENTS <- as.numeric(German_credit$NUM_DEPENDENTS)
+
+for (i in 1:ncol(German_credit)){
+  if (class(German_credit[,i])=="integer"){
+    German_credit[,i] <- factor(German_credit[,i])
+    }
+}
+
+str(German_credit)
+```
+
+
+```{r}
+describe(German_credit)
+```
+
+
+
+```{r}
+introduce(German_credit)
+
+plot_intro(German_credit)
+```
+
+## Plot the data 
+Make a plot of the continuous variables. 
+
+```{r}
+plot_histogram(German_credit)
+```
+
+The data are not really normally distributed. They are right-tailed. 
+
+
+```{r}
+plot_density(German_credit)
+```
+
+```{r}
+plot_boxplot(German_credit, by = 'RESPONSE',  ncol = 2,
+             title = "Side-by-side boxplots")
+```
+
+
+Make a barplot of the categorical variables : 
+
+```{r}
+# categorical_variables <- German_credit%>% 
+#   select(-c("DURATION", "AMOUNT", "INSTALL_RATE", "AGE", "NUM_CREDITS", "NUM_DEPENDENTS"))
+# names_categorical_variables <- colnames(categorical_variables)
+  
+
+for (i in 1:ncol(German_credit)){
+  if (class(German_credit[,i])=="factor"){
+    print(ggplot(German_credit) +
+            geom_bar(aes(x=German_credit[,i]), fill = "coral") +
+            ggtitle(paste("Barplot of", colnames(German_credit)[i])) +
+            labs(x = paste(colnames(German_credit)[i])) 
+            )
+    }
+}
+
+```
+
+From those barplots we can see: 
+
++ The majority of people do not check their account status. (CHK_ACCT)
++ Most people have an average balance of less than < 100 DM in their saving account (SAV_ACCT)
++ Most of the applicants has its own residence (OWN_RES)
++ Almost none of the applicants is a foreign worker (FOREIGN) 
+
+
+
+### Correlation plot : 
+
+Correlation plot between continuous variables : 
+```{r}
+plot_correlation(German_credit, type= 'c', cor_args = list( 'use' = 'complete.obs'))
+```
+
+There are little correlation between the continuous variables. We can notice that there is a correlation of 62% between the variable **DURATION** and **AMOOUNT**. 
+
+Correlation plot between categorical variables : 
+```{r}
+plot_correlation(German_credit, type= 'd')
+```
+
+It is difficult to look at the correlation since there are a lot of variables on the graph. 
+We can still see higher correlation between **RESPONSE 1**: 
+
++ and people that do not check their account (CHK_ACCT_3) 
++ and people that have a critical historical account (HISTORY_4)
++ and the variable _REAL_ESTATE_ (REAL_ESTATE)
++ and applicant that does not have their own property (PROP_UNKN_NONE_0)
++ and applicant that have their own residence (OWN_RES_1)
+
+We can also see some correlation between **RESPONSE 0**: 
+
++ and people that have a checking account status < 0 DM (CHK_ACCT_0)
++ and people that have an average balance in savings account < 100 DM (SAV_ACCT_0)
++ and the variable _REAL_ESTATE_ (REAL_ESTATE)
+
+
+
+## Fitting a model : 
+
+Let's try a lassification tree 
+```{r}
+german.ct <- rpart(RESPONSE ~ ., method = "class", data = German_credit)
+summary(german.ct)
+```
+
+The model is not working yet.
+
+```{r}
+par(pty = "s", mar = c(1, 1, 1, 1))
+plot(german.ct, cex = 1)
+text(german.ct, cex = 0.6)
+```
+
+
+
+
+
+
+
+
