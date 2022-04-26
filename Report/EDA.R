@@ -76,7 +76,9 @@ German_credit$MALE_DIV <- as.factor(German_credit$MALE_DIV)
 German_credit$MALE_SINGLE <- as.factor(German_credit$MALE_SINGLE)
 German_credit$MALE_MAR_or_WID <- as.factor(German_credit$MALE_MAR_or_WID)
 German_credit$CO.APPLICANT <- as.factor(German_credit$CO.APPLICANT)
+
 German_credit$GURANTOR <- as.factor(German_credit$GURANTOR)
+
 German_credit$REAL_ESTATE <- as.factor(German_credit$REAL_ESTATE)
 German_credit$PROP_UNKN_NONE <- as.factor(German_credit$PROP_UNKN_NONE)
 German_credit$OTHER_INSTALL <- as.factor(German_credit$OTHER_INSTALL)

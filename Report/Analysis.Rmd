@@ -1,0 +1,62 @@
+---
+title: "Analysis"
+author: "Elodie Kwan and Katia Voltz"
+date: '2022-04-26'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Import libraries and data
+
+```{r}
+library(rpart)
+German_credit <- read.csv("./../Data_DA/GermanCredit.csv", header = TRUE, sep = ";")
+
+# German_credit$DURATION <- as.numeric(German_credit$DURATION)
+# German_credit$AMOUNT <- as.numeric(German_credit$AMOUNT)
+# German_credit$INSTALL_RATE <- as.numeric(German_credit$INSTALL_RATE)
+# German_credit$AGE <- as.numeric(German_credit$AGE)
+# German_credit$NUM_CREDITS <- as.numeric(German_credit$NUM_CREDITS)
+# German_credit$NUM_DEPENDENTS <- as.numeric(German_credit$NUM_DEPENDENTS)
+# 
+# for (i in 1:ncol(German_credit)){
+#   if (class(German_credit[,i])=="integer"){
+#     German_credit[,i] <- factor(German_credit[,i])
+#     }
+# }
+
+```
+
+
+
+### Fitting a model : 
+
+Let's try a lassification tree 
+```{r}
+german.ct <- rpart(RESPONSE ~ ., method = "class", data = German_credit)
+summary(german.ct)
+```
+
+The model is not working yet.
+
+```{r}
+par(pty = "s", mar = c(1, 1, 1, 1))
+plot(german.ct, cex = 1)
+text(german.ct, cex = 0.6)
+```
+
+
+### Fitting another model : 
+```{r}
+# Logistic regression to see the significant variables (not working)
+mod1 <- glm(RESPONSE~., data = German_credit, family= binomial)
+summary(mod1)
+```
+
+
+
