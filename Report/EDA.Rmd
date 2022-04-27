@@ -12,23 +12,11 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-In this section, we will proceed to an exploratory data analysis of the **German Credit data**. 
-
-### Import libraries and data 
-
-In order to run some codes and functions, we will need to load a few libraries. 
-```{r message = FALSE, warning = FALSE}
-# library(here)
-library(dplyr)
-library(Hmisc)
-library(DataExplorer)
-library(psych)
-library(rpart)
-library(gridExtra)
-library(summarytools)
-
+```{r echo=FALSE}
+source(here::here("scripts/setup.R"))
 ```
 
+In this section, we will proceed to an exploratory data analysis of the **German Credit data**. 
 
 Let's start by importing the dataset. 
 ```{r}
