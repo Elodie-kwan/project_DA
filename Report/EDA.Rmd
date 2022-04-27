@@ -91,6 +91,7 @@ plot_intro(German_credit)
 
 The plot helps us to see the percentage of contnuous variable, the percentage of discrete variables and whether or not some observations are missing. 
 
+
 ## Visualization of the data 
 First, we plot all the continous variables into histograms and their corresponding density plots. 
 
