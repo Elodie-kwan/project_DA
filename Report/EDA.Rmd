@@ -167,4 +167,45 @@ We can also see some correlation between **RESPONSE 0**:
 + and people that have an average balance in savings account < 100 DM (SAV_ACCT_0)
 + and the variable _REAL_ESTATE_ (REAL_ESTATE)
 
+PCA Exploration:
 
+Select the numerical values:
+
+```{r}
+German_credit.num <- German_credit %>% 
+  select('DURATION', 'AMOUNT', 'INSTALL_RATE', 'AGE', 'NUM_CREDITS','NUM_DEPENDENTS')
+```
+
+```{r}
+German_credit.pca <- prcomp(German_credit.num, center = TRUE)
+summary(German_credit.pca)
+```
+
+```{r}
+library(factoextra)
+fviz_eig(German_credit.pca)
+```
+
+```{r}
+fviz_pca_ind(German_credit.pca,
+             col.ind = "cos2", # Colorer par le cos2
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     
+             )
+
+```
+
+```{r}
+fviz_pca_var(German_credit.pca,
+             col.var = "contrib", 
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     
+             )
+
+```
+```{r}
+fviz_pca_biplot(German_credit.pca, repel = TRUE,
+                col.var = "#2E9FDF", 
+                col.ind = "#696969"  
+                )
+```
