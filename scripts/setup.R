@@ -6,7 +6,7 @@
 packages <- c(
 "tidyverse", "readxl", "Hmisc", "DataExplorer", 
 "psych", "rpart", "gridExtra", "summarytools",
-"dplyr",  "ggplot2" 
+"dplyr",  "ggplot2", "factoextra", "rpart.plot"
 )
 
 purrr::walk(packages, library, character.only = TRUE)

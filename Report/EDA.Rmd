@@ -44,6 +44,27 @@ str(German_credit)
 summary(German_credit)
 ```
 
+We notice that the variable **EDUCATION** has a minimum value of '-1' but it should be '0' since there are only 2 levels (0 and 1). Indeed, the observation 37 indicate a value of '-1' for **EDUCATION**. 
+We notice another strange value, in the variable **GUARANTOR**, the maximum value is of '2' while it does not mean anything in our data set. 
+
+After discussion with the Banker, he gave us the correct values to these 2 mistakes. Observation 37 of **EDUCATION** and observation 234 of **GUARANTOR** should be equal to 1.
+
+```{r}
+German_credit$EDUCATION[37] <- 1
+German_credit$EDUCATION <- as.factor(German_credit$EDUCATION)
+
+German_credit$GUARANTOR[234] <- 1
+German_credit$GUARANTOR <- as.factor(German_credit$GUARANTOR)
+```
+
+
+We see that the variable **AGE** has a maximum of 125. This is strange because it is very unlikely that someone lives to the age of 125. We talked to the banker and he confirmed our doubts by telling us that a mistake has been made. At the observation 537, the correct age of the client is 75 years old. He asks us to correct this value in our data set. 
+
+```{r}
+German_credit$AGE[537] <- 75
+```
+
+
 + There are no missing values.
  
 ```{r}
@@ -80,6 +101,7 @@ str(German_credit)
 
 The binomial data are set as factors and the others as numerical. 
 
+
 We can now describe the variables one more time and we should get better results.  
 
 ```{r}
@@ -89,11 +111,11 @@ introduce(German_credit)
 plot_intro(German_credit)
 ```
 
-The plot helps us to see the percentage of contnuous variable, the percentage of discrete variables and whether or not some observations are missing. 
+The plot helps us to see the percentage of continuous variable, the percentage of discrete variables and whether or not some observations are missing. 
 
 
 ## Visualization of the data 
-First, we plot all the continous variables into histograms and their corresponding density plots. 
+First, we plot all the continuous variables into histograms and their corresponding density plots. 
 
 ```{r}
 plot_histogram(German_credit)
@@ -109,6 +131,7 @@ plot_boxplot(German_credit, by = 'RESPONSE',  ncol = 2,
              title = "Side-by-side boxplots")
 ```
 
+This seems not to be disturbing. It makes sense that only a few people has a big credit amount. However it seems that the 'bad' clients tends to ask for bigger credit amount than 'good' clients. 
 
 Now, we can make some barplots of the categorical variables.
 
@@ -127,9 +150,10 @@ for (i in 1:ncol(German_credit)){
 From those barplots we can see: 
 
 + The majority of people do not check their account status. (CHK_ACCT)
-+ Most people have an average balance of less than < 100 DM in their saving account (SAV_ACCT)
-+ Most of the applicants has its own residence (OWN_RES)
-+ Almost none of the applicants is a foreign worker (FOREIGN) 
++ Most people have an average balance of less than < 100 DM in their saving account. (SAV_ACCT)
++ Most of the applicants has its own residence. (OWN_RES)
++ Almost none of the applicants is a foreign worker. (FOREIGN) 
++ We have more information on people that are 'good' applicants and less information on 'bad' applicants. It would be better to have more information on 'bad' applicants as well in order to make good predictions with models. We will have to take this into account later. (RESPONSE)
 
 A general summary can be done. 
 
@@ -145,7 +169,7 @@ Correlation plot between continuous variables :
 plot_correlation(German_credit, type= 'c', cor_args = list( 'use' = 'complete.obs'))
 ```
 
-There are little correlation between the continuous variables. We can notice that there is a correlation of 62% between the variable **DURATION** and **AMOOUNT**. 
+There are little correlation between the continuous variables. We can notice that there is a correlation of 62% between the variable **DURATION** and **AMOOUNT**. This makes sense and is known by the bankers that the bigger the amount of credit, the longer the duration of the credit in months will last. 
 
 Correlation plot between categorical variables : 
 ```{r}
@@ -167,9 +191,10 @@ We can also see some correlation between **RESPONSE 0**:
 + and people that have an average balance in savings account < 100 DM (SAV_ACCT_0)
 + and the variable _REAL_ESTATE_ (REAL_ESTATE)
 
-PCA Exploration:
+### PCA Exploration:
+It is good to perform a PCA Exploration in order to reduce the dimensions or/and see which variables to select. 
 
-Select the numerical values:
+We start by selecting the numerical values:
 
 ```{r}
 German_credit.num <- German_credit %>% 
@@ -182,7 +207,6 @@ summary(German_credit.pca)
 ```
 
 ```{r}
-library(factoextra)
 fviz_eig(German_credit.pca)
 ```
 
@@ -209,3 +233,15 @@ fviz_pca_biplot(German_credit.pca, repel = TRUE,
                 col.ind = "#696969"  
                 )
 ```
+
+
+
+
+We can export the dataset as we have made some modifications. It will be easier for the other files. 
+
+```{r}
+# write.csv(German_credit,"./../Data_DA/GermanCredit_cleaned.csv", row.names = FALSE)
+```
+
+
+

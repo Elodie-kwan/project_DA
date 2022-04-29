@@ -14,31 +14,43 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Import libraries and data
 
 ```{r}
-library(rpart)
-German_credit <- read.csv("./../Data_DA/GermanCredit.csv", header = TRUE, sep = ";")
+German_credit_cleaned <- read.csv("./../Data_DA/GermanCredit_cleaned.csv", header = TRUE)
 
-# German_credit$DURATION <- as.numeric(German_credit$DURATION)
-# German_credit$AMOUNT <- as.numeric(German_credit$AMOUNT)
-# German_credit$INSTALL_RATE <- as.numeric(German_credit$INSTALL_RATE)
-# German_credit$AGE <- as.numeric(German_credit$AGE)
-# German_credit$NUM_CREDITS <- as.numeric(German_credit$NUM_CREDITS)
-# German_credit$NUM_DEPENDENTS <- as.numeric(German_credit$NUM_DEPENDENTS)
-# 
-# for (i in 1:ncol(German_credit)){
-#   if (class(German_credit[,i])=="integer"){
-#     German_credit[,i] <- factor(German_credit[,i])
-#     }
-# }
+German_credit_cleaned$DURATION <- as.numeric(German_credit_cleaned$DURATION)
+German_credit_cleaned$AMOUNT <- as.numeric(German_credit_cleaned$AMOUNT)
+German_credit_cleaned$INSTALL_RATE <- as.numeric(German_credit_cleaned$INSTALL_RATE)
+German_credit_cleaned$AGE <- as.numeric(German_credit_cleaned$AGE)
+German_credit_cleaned$NUM_CREDITS <- as.numeric(German_credit_cleaned$NUM_CREDITS)
+German_credit_cleaned$NUM_DEPENDENTS <- as.numeric(German_credit_cleaned$NUM_DEPENDENTS)
 
+for (i in 1:ncol(German_credit_cleaned)){
+  if (class(German_credit_cleaned[,i])=="integer"){
+    German_credit_cleaned[,i] <- factor(German_credit_cleaned[,i])
+    }
+}
+
+str(German_credit_cleaned)
+```
+
+### Traning set and Test set 
+In order to fit some model, we are going to split our dataset into 2 sets. The **training set** and the **test set**. We do not forget to take the first variable **OBS.** out as it represents the index number for each observation. 
+
+```{r}
+set.seed(1234)
+# indexes of the training set observations 
+index.tr <- sample(x = 1:nrow(German_credit_cleaned), size= 3/4*nrow(German_credit_cleaned), replace=FALSE)
+# training set 
+German_credit.tr <- German_credit_cleaned[index.tr,-1]
+# test set 
+German_credit.te <- German_credit_cleaned[-index.tr,-1]
 ```
 
 
+### Fitting a model : Classification Tree (Decision Tree)
 
-### Fitting a model : 
-
-Let's try a lassification tree 
+Let's try a classification tree 
 ```{r}
-german.ct <- rpart(RESPONSE ~ ., method = "class", data = German_credit)
+german.ct <- rpart(RESPONSE ~ ., method = "class", data = German_credit.tr )
 summary(german.ct)
 ```
 
@@ -48,13 +60,15 @@ The model is not working yet.
 par(pty = "s", mar = c(1, 1, 1, 1))
 plot(german.ct, cex = 1)
 text(german.ct, cex = 0.6)
+
+rpart.plot(german.ct)
 ```
 
 
-### Fitting another model : 
+### Fitting another model : Logistic Regression 
 ```{r}
 # Logistic regression to see the significant variables (not working)
-mod1 <- glm(RESPONSE~., data = German_credit, family= binomial)
+mod1 <- glm(RESPONSE~., data = German_credit_cleaned[, -1], family= binomial)
 summary(mod1)
 ```
 
