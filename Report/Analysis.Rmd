@@ -11,6 +11,10 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r echo=FALSE, message=FALSE}
+source(here::here("scripts/setup.R"))
+```
+
 ### Import libraries and data
 
 ```{r}
@@ -64,6 +68,36 @@ text(german.ct, cex = 0.6)
 rpart.plot(german.ct)
 ```
 
+#### Pruning the tree 
+
+```{r}
+plotcp(german.ct)
+```
+
+From the graph, we can identify that, according to the 1-SE rule, the tree with 4 nodes is equivalent to the tree with 10 nodes. This 4-nodes tree should be preferred.
+
+The value of cp = 0.029 has been chosen arbitrarily between 0.016 and 0.052.
+
+```{r}
+german.ct.prune <- prune(german.ct, cp=0.029)
+rpart.plot(german.ct.prune)
+```
+
+We decide to also look at what would an automatically pruned using 1-SE rule would give use. 
+```{r}
+set.seed(1234)
+rpart.plot(autoprune(RESPONSE ~ ., method = "class", data = German_credit.tr))
+```
+Using the pruned tree we made by hand we can compute the prediction and build a confusion matrix.
+
+```{r}
+german.ct.prediction <- predict(german.ct.prune, newdata=German_credit.te, type="class")
+
+# Confusion Matrix
+table(Pred=german.ct.prediction, Obs=German_credit.te$RESPONSE)
+```
+
+For the prediction of "bad" applicant, our model is not good. We need to balance our data.
 
 ### Fitting another model : Logistic Regression 
 ```{r}
