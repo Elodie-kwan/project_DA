@@ -178,7 +178,7 @@ confusionMatrix(data=German_Credit.pred, reference = German_credit.te$RESPONSE)
 
 
 ## Bootstrap with 10 replicates
-We now apply the bootstrap with 100 replicates. Like for CV, we use **caret**.
+We now apply the bootstrap with 10 replicates. Like for CV, we use **caret**.
 
 The approach is the same as before. 
 We only need to change the method in the **trainControl** function. The corresponding method is “boot632”.
