@@ -157,6 +157,19 @@ table(Pred=German_credit.te.pred, Observed=German_credit.te[,25])
 
 ...
 
+```{r}
+library(e1071)
+German_credit.svm <- svm(RESPONSE ~ ., data=German_credit.tr, kernel="linear")
+German_credit.svm
+German_credit.svm.pred <- predict(German_credit.svm, newdata = German_credit.te)
+
+# confusion matrix 
+table(Pred=German_credit.svm.pred, obs=German_credit.te$RESPONSE)
+```
+
+
+
+
 
 
 
