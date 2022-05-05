@@ -58,7 +58,7 @@ german.ct <- rpart(RESPONSE ~ ., method = "class", data = German_credit.tr )
 summary(german.ct)
 ```
 
-The model is not working yet.
+Then we plot the classification tree. 
 
 ```{r}
 par(pty = "s", mar = c(1, 1, 1, 1))
@@ -88,7 +88,7 @@ We decide to also look at what would an automatically pruned using 1-SE rule wou
 set.seed(1234)
 rpart.plot(autoprune(RESPONSE ~ ., method = "class", data = German_credit.tr))
 ```
-Using the pruned tree we made by hand we can compute the prediction and build a confusion matrix.
+Using the pruned tree we made by hand, we can compute the prediction and build a confusion matrix.
 
 ```{r}
 german.ct.prediction <- predict(german.ct.prune, newdata=German_credit.te, type="class")
