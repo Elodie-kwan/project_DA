@@ -177,4 +177,20 @@ confusionMatrix(data=German_Credit.pred, reference = German_credit.te$RESPONSE)
 ```
 
 
+## Bootstrap with 10 replicates
+We now apply the bootstrap with 100 replicates. Like for CV, we use **caret**.
+
+The approach is the same as before. 
+We only need to change the method in the **trainControl** function. The corresponding method is “boot632”.
+
+100 replicates is veryyyy long to run... can do that on less sample ?? I put 10, takes 3 minutes for me
+
+```{r cache = TRUE}
+
+trctrl <- trainControl(method = "boot632", number=10)
+German_credit.boot <- train(RESPONSE ~., data = German_credit.tr, method = "glmStepAIC", family="binomial",
+                   trControl=trctrl, trace = 0)
+
+German_credit.boot
+```
 
