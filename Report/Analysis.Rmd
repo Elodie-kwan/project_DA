@@ -108,3 +108,73 @@ summary(mod1)
 
 
 
+## Next Analysis 
+
+- Balance the data using either method. 
+- Then, using **caret** and either CV or Bootstrap, put several models in competition. 
+- Select the best one according to your choice of score. 
+- Finally, use the test set to see if the best model does not overfit the training set.
+
+By doing this, we will have achieved a complete supervised learning task from A to Z.
+
+
+## 1/ Balancing the dataset
+
+In this part, we apply the balancing data technique in order to improve the prediction of “Good Credit” and "Bad Credit". The table below reveals the unbalance problem.
+
+```{r}
+## Statistics on the training set
+table(German_credit.tr$RESPONSE)
+```
+
+Indeed, we observe that the 'Good Credit' (1) response appears 527 times in the training set and 'Bad Credit' (0) 223, two times less.
+Since there are many more 'Good Credit' than 'Bad Credit', any model favors the prediction of the'Good Credit'. It results a good accuracy but the specificity is low, as well as the balanced accuracy.
+
+
+### Sub-sampling
+Balancing using sub-sampling consists of taking all the cases in the smallest class (here “Bad Credit”) and extract at random the same amount of cases in the largest category (here “Good”).
+
+```{r}
+n.Bad_Credit <- min(table(German_credit.tr$RESPONSE))
+
+German_credit.tr.Bad_Credit <- filter(German_credit.tr, RESPONSE == 0) ## the "0" cases
+German_credit.tr.Good_Credit <- filter(German_credit.tr, RESPONSE == 1) ## The "1" cases
+
+index.no <- sample(size=n.Bad_Credit, x=1:nrow(German_credit.tr.Good_Credit), replace=FALSE) 
+  ## sub-sample 840 instances from the "No"
+
+German_Credit.tr.subs <- data.frame(rbind(German_credit.tr.Bad_Credit, German_credit.tr.Good_Credit[index.no,])) 
+  ## Bind all the "Yes" and the sub-sampled "No"
+
+table(German_Credit.tr.subs$RESPONSE) ## The cases are balanced
+```
+
+The dataset is now balanced.
+
+
+### Cross-validation with caret
+The 10-CV can be easily obtained from **caret**. 
+
+First, set up the splitting data method using the **trainControl** function.
+
+```{r}
+German_Credit.trctrl <- trainControl(method = "cv", number=10)
+```
+
+```{r}
+German.Credit.cv <- train(RESPONSE ~., data = German_credit.tr,
+                method = "glmStepAIC", 
+                family="binomial",
+                trControl=trctrl, trace=0)
+German.Credit.cv
+```
+
+
+```{r}
+German_Credit.pred <- predict(Germain.Credit.cv, newdata = German_credit.te)
+
+confusionMatrix(data=German_Credit.pred, reference = German_credit.te$RESPONSE)
+```
+
+
+
