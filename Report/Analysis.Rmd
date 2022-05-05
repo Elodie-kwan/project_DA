@@ -171,7 +171,7 @@ German.Credit.cv
 
 
 ```{r}
-German_Credit.pred <- predict(Germain.Credit.cv, newdata = German_credit.te)
+German_Credit.pred <- predict(German.Credit.cv, newdata = German_credit.te)
 
 confusionMatrix(data=German_Credit.pred, reference = German_credit.te$RESPONSE)
 ```
