@@ -107,6 +107,58 @@ summary(mod1)
 ```
 
 
+### Fitting another model : KNN
+
+
+Now, we make the prediction using a 2-NN (with Euclidean distance).
+
+```{r}
+German_credit.num.response <- German_credit %>% 
+  select('RESPONSE','DURATION', 'AMOUNT', 'INSTALL_RATE', 'AGE', 'NUM_CREDITS','NUM_DEPENDENTS')
+```
+
+```{r}
+German_credit.knn <- knn3(data=German_credit.num.response, RESPONSE~., k=2) ## build the K-NN model
+
+German_credit.pred <- predict(German_credit.knn, newdata = German_credit.num.response, type="class")
+
+German_credit.pred
+```
+
+Now we can use the 2-NN to predict the test set using the training set. 
+Note that the model is fitting on the training set and the predictions are computed on the test set.
+
+```{r}
+German_credit.knn <- knn3(data=German_credit.tr, RESPONSE~., k=2)  # k = 2
+
+German_credit.te.pred <- predict(German_credit.knn, newdata = German_credit.te, type="class")
+```
+
+To compare the predictions above and the true species (the one in the test set), we can build a table. It is called a **confusion matrix** (again, this will be detail later on).
+
+```{r}
+table(Pred=German_credit.te.pred, Observed=German_credit.te[,25])
+```
+The table is read as follow : 
++ We predicted 13 Bad credits and there were indeed 13 observed Bad credits. But the prediction misjudge 45 good credits by predicting bad credits.
++ We predicted 143 Good credits as it was in fact a Good credits 
+
+The prediction is not perfect. We need to try to improve the prediction by changing K at that point. Therefore, we use K=3.
+
+```{r}
+German_credit.knn <- knn3(data=German_credit.tr, RESPONSE~., k=3)  # k = 3
+German_credit.te.pred <- predict(German_credit.knn, newdata = German_credit.te, type="class")
+
+table(Pred=German_credit.te.pred, Observed=German_credit.te[,25])
+```
+
+### Support Vector Machine
+
+
+...
+
+
+
 
 ## Next Analysis 
 
@@ -118,7 +170,7 @@ summary(mod1)
 By doing this, we will have achieved a complete supervised learning task from A to Z.
 
 
-## 1/ Balancing the dataset
+## Balancing the dataset
 
 In this part, we apply the balancing data technique in order to improve the prediction of “Good Credit” and "Bad Credit". The table below reveals the unbalance problem.
 
