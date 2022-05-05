@@ -202,9 +202,11 @@ German_credit.num <- German_credit %>%
 ```
 
 ```{r}
-German_credit.pca <- prcomp(German_credit.num, center = TRUE)
+German_credit.pca <- prcomp(German_credit.num, center = TRUE, scale = TRUE)
 summary(German_credit.pca)
 ```
+
+From the PCA summary we can see 4 principal components should be taken into account in order to explain approximately 81% of the variation of the data.
 
 ```{r}
 fviz_eig(German_credit.pca)
@@ -227,6 +229,12 @@ fviz_pca_var(German_credit.pca,
              )
 
 ```
+
+From this circle of correlations, we see that : 
+
++ The first principal component PC1 is strongly positively correlated with the variables **AMOUNT** and **DURATION**. So the larger PC1, the larger these features. It is also a little bit negatively correlated with **INSTALL_RATE**.  
++ The second principal component PC2 is strongly positively correlated with **AGE**, **NUM_DEPENDENTS** and **NUM_CREDITS**. 
+
 ```{r}
 fviz_pca_biplot(German_credit.pca, repel = TRUE,
                 col.var = "#2E9FDF", 
@@ -234,7 +242,7 @@ fviz_pca_biplot(German_credit.pca, repel = TRUE,
                 )
 ```
 
-
+From this biplot, we can see some characteristics of the observations.
 
 
 We can export the dataset as we have made some modifications. It will be easier for the other files. 
