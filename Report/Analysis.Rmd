@@ -167,7 +167,47 @@ German_credit.svm.pred <- predict(German_credit.svm, newdata = German_credit.te)
 table(Pred=German_credit.svm.pred, obs=German_credit.te$RESPONSE)
 ```
 
+```{r}
+confusionMatrix(data=German_credit.svm.pred, reference = German_credit.te$RESPONSE )
+```
 
+### Radial basis SVM
+We try now with a radial basis kernel (the default).
+
+```{r}
+German_credit.rb <- svm(RESPONSE ~ ., data=German_credit.tr, kernel="radial")
+German_credit.rb
+
+German_credit.pred <- predict(German_credit.rb, newdata = German_credit.te)
+confusionMatrix(data=German_credit.pred, reference = German_credit.te$RESPONSE )
+```
+The accuracy is lower, 71.2%, compared to 74% with the linear method.
+
+
+
+### Linear SVM
+
+```{r}
+set.seed(143)
+svm_Linear <- train(RESPONSE ~., data = German_credit.tr, method = "svmLinear",
+                    trControl=German_Credit.trctrl)
+svm_Linear
+```
+
+```{r}
+grid <- expand.grid(C = c(0.01, 0.1, 1, 10, 100, 1000))
+grid
+
+set.seed(143)
+svm_Linear_Grid <- train(RESPONSE ~., data = German_credit.tr, method = "svmLinear",
+                           trControl=German_Credit.trctrl,
+                           tuneGrid = grid)
+svm_Linear_Grid
+
+plot(svm_Linear_Grid)
+
+svm_Linear_Grid$bestTune
+```
 
 
 
