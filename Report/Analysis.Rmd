@@ -42,19 +42,60 @@ In order to fit some model, we are going to split our dataset into 2 sets. The *
 ```{r}
 set.seed(1234)
 # indexes of the training set observations 
-index.tr <- sample(x = 1:nrow(German_credit_cleaned), size= 3/4*nrow(German_credit_cleaned), replace=FALSE)
+index.tr <- sample(x = 1:nrow(German_credit_cleaned), 
+                   size= 3/4*nrow(German_credit_cleaned), replace=FALSE)
 # training set 
 German_credit.tr <- German_credit_cleaned[index.tr,-1]
 # test set 
 German_credit.te <- German_credit_cleaned[-index.tr,-1]
 ```
 
+### Balancing the dataset
+
+In this part, we apply the balancing data technique in order to improve the predictions of “Good Credit” and "Bad Credit", since we have more observations on the "Bad Credit".
+
+The table below reveals the unbalanced problem.
+
+```{r}
+## Statistics on the training set
+table(German_credit.tr$RESPONSE)
+```
+
+Indeed, we observe that the "Good Credit" (1) response appears **527** times in the training set and "Bad Credit" (0) **223**, two times less.
+Since there are many more "Good Credit" than "Bad Credit", any model favors the prediction of the "Good Credit". It results a good accuracy but the specificity is low, as well as the balanced accuracy.
+
+
+#### Sub-sampling
+Balancing using sub-sampling consists of taking all the cases in the smallest class (here “Bad Credit”) and extract at random the same amount of cases in the largest category (here “Good”).
+
+```{r}
+n.Bad_Credit <- min(table(German_credit.tr$RESPONSE)) ## 32
+
+## the "0" cases
+German_credit.tr.Bad_Credit <- filter(German_credit.tr, RESPONSE == 0) 
+
+## The "1" cases
+German_credit.tr.Good_Credit <- filter(German_credit.tr, RESPONSE == 1)
+
+## sub-sample 32 instances from the "Good Credit" by drawing indexes
+index.no <- sample(size=n.Bad_Credit, x=1:nrow(German_credit.tr.Good_Credit), replace=FALSE) 
+
+## Bind all the "Bad" and the sub-sampled "Good"
+German_Credit.tr.subs <- data.frame(rbind(German_credit.tr.Bad_Credit,
+                                          German_credit.tr.Good_Credit[index.no,])) 
+
+## The cases are balanced
+table(German_Credit.tr.subs$RESPONSE) 
+```
+
+The dataset is now balanced.
+
 
 ### Fitting a model : Classification Tree (Decision Tree)
 
 Let's try a classification tree 
 ```{r}
-german.ct <- rpart(RESPONSE ~ ., method = "class", data = German_credit.tr )
+german.ct <- rpart(RESPONSE ~ ., method = "class", data = German_Credit.tr.subs )
 summary(german.ct)
 ```
 
@@ -68,98 +109,152 @@ text(german.ct, cex = 0.6)
 rpart.plot(german.ct)
 ```
 
+The tree is quite big and we want to know if we can prune it. 
+
 #### Pruning the tree 
 
 ```{r}
+printcp(german.ct)
+
 plotcp(german.ct)
 ```
 
-From the graph, we can identify that, according to the 1-SE rule, the tree with 4 nodes is equivalent to the tree with 10 nodes. This 4-nodes tree should be preferred.
+From the list of **cp** (complexity parameter), we would choose the line that has the lowest cross valiadation error. This can be seen on the column **xerror**. So the best cp would be 0.022422 with one split.  
 
-The value of cp = 0.029 has been chosen arbitrarily between 0.016 and 0.052.
+From the graph, we can identify that, according to the 1-SE rule, the tree with 2 and 3 are equivalent. The tree with 3 nodes should be preferred. Tt appears below the dotted-line. 
+
+The value of cp can be chosen arbitrarily between 0.018 and 0.095. So we decided to go with the suggested cp of 0.022 from the summary. 
 
 ```{r}
-german.ct.prune <- prune(german.ct, cp=0.029)
+german.ct.prune <- prune(german.ct, cp=0.022)
 rpart.plot(german.ct.prune)
 ```
 
 We decide to also look at what would an automatically pruned using 1-SE rule would give use. 
 ```{r}
 set.seed(1234)
-rpart.plot(autoprune(RESPONSE ~ ., method = "class", data = German_credit.tr))
+rpart.plot(autoprune(RESPONSE ~ ., method = "class", data = German_Credit.tr.subs))
 ```
+
 Using the pruned tree we made by hand, we can compute the prediction and build a confusion matrix.
 
 ```{r}
 german.ct.prediction <- predict(german.ct.prune, newdata=German_credit.te, type="class")
 
 # Confusion Matrix
-table(Pred=german.ct.prediction, Obs=German_credit.te$RESPONSE)
+confusionMatrix(data=german.ct.prediction, reference = German_credit.te$RESPONSE)
 ```
 
-For the prediction of "bad" applicant, our model is not good. We need to balance our data.
+The accuracy of the classification tree model is not really good (0.564), however we see that the balanced accuracy (0.6345) is a little bit better but still not enough. 
+
 
 ### Fitting another model : Logistic Regression 
 ```{r}
 # Logistic regression to see the significant variables (not working)
-mod1 <- glm(RESPONSE~., data = German_credit_cleaned[, -1], family= binomial)
-summary(mod1)
+logreg <- glm(RESPONSE~., data = German_Credit.tr.subs, family= binomial)
+summary(logreg)
 ```
+
+
+We can predict using the logistic regression. 
+
+```{r}
+german.logrer.pred_prob <- predict(logreg, newdata = German_credit.te,
+                                    type="response")
+
+german.logrer.pred <- ifelse(german.logrer.pred_prob >= 0.5, 1, 0)
+
+# Confusion Matrix
+confusionMatrix(data=as.factor(german.logrer.pred),
+                reference = German_credit.te$RESPONSE)
+```
+
+From the confusion matrix summary, this model is better than the classification tree as the accuracy is higher (0.704) and that the balanced accuracy seems to be almost good as well ( 0.6852)
+
+!!! To check with normal data, it seems it is pretty good too !!!
+
 
 
 ### Fitting another model : KNN
-
-
+To perform a k-nearest neighbor method, we do not need to balance the data so we will use the unbalanced training set.
 Now, we make the prediction using a 2-NN (with Euclidean distance).
 
 ```{r}
-German_credit.num.response <- German_credit %>% 
-  select('RESPONSE','DURATION', 'AMOUNT', 'INSTALL_RATE', 'AGE', 'NUM_CREDITS','NUM_DEPENDENTS')
+German_credit.num.response <- German_credit_cleaned %>% 
+  select('RESPONSE','DURATION', 'AMOUNT', 
+         'INSTALL_RATE', 'AGE', 'NUM_CREDITS','NUM_DEPENDENTS')
 ```
 
 ```{r}
-German_credit.knn <- knn3(data=German_credit.num.response, RESPONSE~., k=2) ## build the K-NN model
+## build the K-NN model with k = 2 
+German_credit.knn <- knn3(data=German_credit.num.response, RESPONSE~., k=2) 
 
-German_credit.pred <- predict(German_credit.knn, newdata = German_credit.num.response, type="class")
+German_credit.knn.pred <- predict(German_credit.knn, 
+                                  newdata = German_credit.num.response, type="class")
 
-German_credit.pred
+German_credit.knn.pred
 ```
 
 Now we can use the 2-NN to predict the test set using the training set. 
 Note that the model is fitting on the training set and the predictions are computed on the test set.
 
 ```{r}
-German_credit.knn <- knn3(data=German_credit.tr, RESPONSE~., k=2)  # k = 2
+# applying Knn model with k = 2 on the training set
+German_credit.knn.tr <- knn3(data=German_credit.tr, RESPONSE~., k=2)  
 
-German_credit.te.pred <- predict(German_credit.knn, newdata = German_credit.te, type="class")
+German_credit.knn.tr.pred <- predict(German_credit.knn.tr, 
+                                     newdata = German_credit.te, type="class")
 ```
 
-To compare the predictions above and the true species (the one in the test set), we can build a table. It is called a **confusion matrix** (again, this will be detail later on).
+To compare the predictions above and the true species (the one in the test set), we can build a table. It is called a **confusion matrix** (again, this will be detailed later on).
 
 ```{r}
-table(Pred=German_credit.te.pred, Observed=German_credit.te[,25])
+table(Pred=German_credit.knn.tr.pred, Observed=German_credit.te$RESPONSE)
 ```
+
 The table is read as follow : 
-+ We predicted 13 Bad credits and there were indeed 13 observed Bad credits. But the prediction misjudge 45 good credits by predicting bad credits.
+
++ We predicted 13 Bad credits and there were indeed 13 observed Bad credits. But the prediction misjudges 45 good credits by predicting bad credits.
 + We predicted 143 Good credits as it was in fact a Good credits 
+
+```{r}
+# Confusion Matrix
+confusionMatrix(data=German_credit.knn.tr.pred,
+                reference = German_credit.te$RESPONSE)
+```
+
+The accuracy (0.6) and the unbalanced accuracy (0.5020) are both a bit too low. 
 
 The prediction is not perfect. We need to try to improve the prediction by changing K at that point. Therefore, we use K=3.
 
 ```{r}
-German_credit.knn <- knn3(data=German_credit.tr, RESPONSE~., k=3)  # k = 3
-German_credit.te.pred <- predict(German_credit.knn, newdata = German_credit.te, type="class")
+# applying Knn model with k = 3 on the training set
+German_credit.knn3.tr <- knn3(data=German_credit.tr, RESPONSE~., k=3)  
 
-table(Pred=German_credit.te.pred, Observed=German_credit.te[,25])
+German_credit.knn3.tr.pred <- predict(German_credit.knn3.tr, 
+                                      newdata = German_credit.te, type="class")
+
+table(Pred=German_credit.knn3.tr.pred, Observed=German_credit.te$RESPONSE)
 ```
 
-### Support Vector Machine
+
+```{r}
+# Confusion Matrix
+confusionMatrix(data=German_credit.knn3.tr.pred,
+                reference = German_credit.te$RESPONSE)
+```
+
+Both the accuracy (0.636) and the balanced data (0.5100) improved a little bit with k = 3 compared to k = 2. 
+The accuracies might still be a bit low.
+
+
+### Linear Support Vector Machine
 
 
 ...
 
 ```{r}
-library(e1071)
-German_credit.svm <- svm(RESPONSE ~ ., data=German_credit.tr, kernel="linear")
+German_credit.svm <- svm(RESPONSE ~ ., data=German_Credit.tr.subs, kernel="linear")
 German_credit.svm
 German_credit.svm.pred <- predict(German_credit.svm, newdata = German_credit.te)
 
@@ -171,37 +266,50 @@ table(Pred=German_credit.svm.pred, obs=German_credit.te$RESPONSE)
 confusionMatrix(data=German_credit.svm.pred, reference = German_credit.te$RESPONSE )
 ```
 
-### Radial basis SVM
+The accuracy (0.692) and the balanced accuracy (0.6802) are lower than 0.75 which means that it might not be good enough. 
+
+### Radial basis Support Vector Machine
 We try now with a radial basis kernel (the default).
 
 ```{r}
-German_credit.rb <- svm(RESPONSE ~ ., data=German_credit.tr, kernel="radial")
+German_credit.rb <- svm(RESPONSE ~ ., data=German_Credit.tr.subs, kernel="radial")
 German_credit.rb
 
 German_credit.pred <- predict(German_credit.rb, newdata = German_credit.te)
 confusionMatrix(data=German_credit.pred, reference = German_credit.te$RESPONSE )
 ```
-The accuracy is lower, 71.2%, compared to 74% with the linear method.
+The accuracy is better, 70%, compared to 69% with the linear method.
 
 
 
-### Linear SVM
+### Tunning the hyperparameters of Linear SVM
+
+We want to select the good hyperparameters for our linear SVM.
+
+```{r}
+German_Credit.trctrl <- trainControl(method = "cv", number=10)
+```
+
 
 ```{r}
 set.seed(143)
-svm_Linear <- train(RESPONSE ~., data = German_credit.tr, method = "svmLinear",
+svm_Linear <- train(RESPONSE ~., data = German_Credit.tr.subs, method = "svmLinear",
                     trControl=German_Credit.trctrl)
 svm_Linear
 ```
 
-```{r}
+We see that we have a good accuracy (0.72). 
+
+
+```{r cache = TRUE}
 grid <- expand.grid(C = c(0.01, 0.1, 1, 10, 100, 1000))
 grid
 
 set.seed(143)
-svm_Linear_Grid <- train(RESPONSE ~., data = German_credit.tr, method = "svmLinear",
-                           trControl=German_Credit.trctrl,
-                           tuneGrid = grid)
+svm_Linear_Grid <- train(RESPONSE ~., data = German_Credit.tr.subs,
+                         method = "svmLinear",
+                         trControl=German_Credit.trctrl,
+                         tuneGrid = grid)
 svm_Linear_Grid
 
 plot(svm_Linear_Grid)
@@ -209,6 +317,48 @@ plot(svm_Linear_Grid)
 svm_Linear_Grid$bestTune
 ```
 
+
+### Tunning the hyperparameters of Radial basis SVM
+
+```{r}
+grid_radial <- expand.grid(sigma = c(0.01, 0.02, 0.05, 0.1),
+                           C = c(1, 10, 100, 500, 1000))
+grid_radial
+```
+
+```{r cache = TRUE}
+set.seed(143)
+
+svm_Radial_Grid <- train(RESPONSE ~., data = German_Credit.tr.subs, 
+                         method = "svmRadial",
+                         trControl=German_Credit.trctrl,
+                         tuneGrid = grid_radial)
+
+svm_Radial_Grid
+```
+
+
+```{r}
+plot(svm_Radial_Grid)
+
+svm_Radial_Grid$bestTune
+```
+
+
+```{r}
+German_credit.rb.tuned <- svm(RESPONSE ~ .,data = German_Credit.tr.subs,
+                              kernel = "radial", 
+                              gamma = svm_Radial_Grid$bestTune$sigma,
+                              cost = svm_Radial_Grid$bestTune$C)
+
+German_credit.rb.tuned.pred <- predict(German_credit.rb.tuned, 
+                                       newdata = German_credit.te)
+
+confusionMatrix(data=German_credit.rb.tuned.pred, 
+                reference = German_credit.te$RESPONSE)
+```
+
+We have an accuracy of 0.696 and a balanced accuracy of 0.6975. 
 
 
 
@@ -222,39 +372,6 @@ svm_Linear_Grid$bestTune
 
 By doing this, we will have achieved a complete supervised learning task from A to Z.
 
-
-## Balancing the dataset
-
-In this part, we apply the balancing data technique in order to improve the prediction of “Good Credit” and "Bad Credit". The table below reveals the unbalance problem.
-
-```{r}
-## Statistics on the training set
-table(German_credit.tr$RESPONSE)
-```
-
-Indeed, we observe that the 'Good Credit' (1) response appears 527 times in the training set and 'Bad Credit' (0) 223, two times less.
-Since there are many more 'Good Credit' than 'Bad Credit', any model favors the prediction of the'Good Credit'. It results a good accuracy but the specificity is low, as well as the balanced accuracy.
-
-
-### Sub-sampling
-Balancing using sub-sampling consists of taking all the cases in the smallest class (here “Bad Credit”) and extract at random the same amount of cases in the largest category (here “Good”).
-
-```{r}
-n.Bad_Credit <- min(table(German_credit.tr$RESPONSE))
-
-German_credit.tr.Bad_Credit <- filter(German_credit.tr, RESPONSE == 0) ## the "0" cases
-German_credit.tr.Good_Credit <- filter(German_credit.tr, RESPONSE == 1) ## The "1" cases
-
-index.no <- sample(size=n.Bad_Credit, x=1:nrow(German_credit.tr.Good_Credit), replace=FALSE) 
-  ## sub-sample 840 instances from the "No"
-
-German_Credit.tr.subs <- data.frame(rbind(German_credit.tr.Bad_Credit, German_credit.tr.Good_Credit[index.no,])) 
-  ## Bind all the "Yes" and the sub-sampled "No"
-
-table(German_Credit.tr.subs$RESPONSE) ## The cases are balanced
-```
-
-The dataset is now balanced.
 
 
 ### Cross-validation with caret
