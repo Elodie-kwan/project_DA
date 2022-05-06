@@ -230,7 +230,7 @@ German_Credit.trctrl <- trainControl(method = "cv", number=10)
 German.Credit.cv <- train(RESPONSE ~., data = German_credit.tr,
                 method = "glmStepAIC", 
                 family="binomial",
-                trControl=trctrl, trace=0)
+                trControl=German_Credit.trctrl, trace=0)
 German.Credit.cv
 ```
 
