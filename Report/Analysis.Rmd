@@ -166,6 +166,7 @@ The accuracy of the classification tree model is not really good (0.584) althoug
 #### Variable importance of the classification tree 
 
 ```{r}
+varImp(german.ct.prune)
 vip(german.ct.prune)
 ```
 
@@ -195,6 +196,25 @@ From the confusion matrix summary, this model is better than the classification 
 
 !!! To check with normal data, it seems it is pretty good too !!!
 
+#### Variable importance for logistic regression
+
+```{r}
+x_train <- select(German_Credit.tr.subs, -RESPONSE)
+y_train <- pull(German_Credit.tr.subs, RESPONSE)
+
+explainer_logreg <- explain(model = logreg, 
+                               data = x_train, 
+                               y = as.numeric(y_train), 
+                               label = "Logistic Regression")
+
+
+importance_logreg  <- calculate_importance(explainer_logreg)
+plot(importance_logreg)
+```
+
+```{r}
+vip(logreg)
+```
 
 
 ### Fitting another model : KNN
