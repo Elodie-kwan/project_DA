@@ -130,12 +130,6 @@ german.ct.prune <- prune(german.ct, cp=0.022)
 rpart.plot(german.ct.prune)
 ```
 
-We decide to also look at what would an automatically pruned using 1-SE rule would give use. 
-```{r}
-set.seed(1234)
-rpart.plot(autoprune(RESPONSE ~ ., method = "class", data = German_Credit.tr.subs))
-```
-
 Using the pruned tree we made by hand, we can compute the prediction and build a confusion matrix.
 
 ```{r}
@@ -146,6 +140,27 @@ confusionMatrix(data=german.ct.prediction, reference = German_credit.te$RESPONSE
 ```
 
 The accuracy of the classification tree model is not really good (0.564), however we see that the balanced accuracy (0.6345) is a little bit better but still not enough. 
+
+
+We decide to also look at what would an automatically pruned using 1-SE rule would give use and compare the model. 
+```{r}
+set.seed(1234)
+german.ct.autoprune <- autoprune(RESPONSE ~ ., method = "class",
+                                 data = German_Credit.tr.subs)
+rpart.plot(german.ct.autoprune )
+```
+
+```{r}
+german.ct.autoprune.prediction <- predict(german.ct.autoprune,
+                                          newdata=German_credit.te,
+                                          type="class")
+
+# Confusion Matrix
+confusionMatrix(data=german.ct.autoprune.prediction,
+                reference = German_credit.te$RESPONSE)
+```
+
+The accuracy of the classification tree model is not really good (0.584) althought it is a little bit better than the one we fitted by hand. We also see that the balanced accuracy (0.6418) is a little bit better than its accuracy and the balanced accuracy of the other model, but still not enough.
 
 
 ### Fitting another model : Logistic Regression 
