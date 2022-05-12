@@ -163,6 +163,13 @@ confusionMatrix(data=german.ct.autoprune.prediction,
 The accuracy of the classification tree model is not really good (0.584) althought it is a little bit better than the one we fitted by hand. We also see that the balanced accuracy (0.6418) is a little bit better than its accuracy and the balanced accuracy of the other model, but still not enough.
 
 
+#### Variable importance of the classification tree 
+
+```{r}
+vip(german.ct.prune)
+```
+
+
 ### Fitting another model : Logistic Regression 
 ```{r}
 # Logistic regression to see the significant variables (not working)
@@ -425,8 +432,9 @@ We only need to change the method in the **trainControl** function. The correspo
 ```{r cache = TRUE}
 
 trctrl <- trainControl(method = "boot632", number=10)
-German_credit.boot <- train(RESPONSE ~., data = German_credit.tr, method = "glmStepAIC", family="binomial",
-                   trControl=trctrl, trace = 0)
+German_credit.boot <- train(RESPONSE ~., data = German_credit.tr,
+                            method = "glmStepAIC", family="binomial",
+                            trControl=trctrl, trace = 0)
 
 German_credit.boot
 ```
