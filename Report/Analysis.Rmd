@@ -403,13 +403,50 @@ confusionMatrix(data=German_credit.rb.tuned.pred,
 We have an accuracy of 0.696 and a balanced accuracy of 0.6975. 
 
 
+### Neural network - Simple hyperparameter tuning
+
+To select the good parameters, we build a search grid and fit the model with each possible value in the grid. This is brute force and time consuming. The best model is selected among all the possible choices.
+```{r cache = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
+set.seed(1)
+fitControl <- trainControl(method = "cv", 
+                           number = 10)
+
+nnetGrid <-  expand.grid(size = seq(from = 1, to = 6, by = 1),
+                        decay = seq(from = 0.1, to = 0.5, by = 0.1))
+
+nnetFit <- train(RESPONSE ~ ., 
+                 data = German_credit.tr,
+                 method = "nnet",
+                 metric = "Accuracy",
+                 tuneGrid = nnetGrid,
+                 trControl = fitControl)
+
+```
+
+```{r}
+plot(nnetFit)
+```
+The best Neural Networks parameters would be to choose (might be 3? to discuss) 4 hidden layers, with a decay of 0.3. 
+
+```{r}
+set.seed(345)
+nn4 <- nnet(RESPONSE ~ ., data=German_credit.tr, size=4, decay = 0.3)
+
+nn4_pred <- predict(nn4, type="class")
+tab4 <- table(Obs=German_credit.tr$RESPONSE, Pred=nn4_pred) # confusion matrix
+tab4
+(acc4 <- sum(diag(tab4))/sum(tab4)) # accuracy
+
+```
+The accuracy of the neural network is of 82.13% 
+
 
 
 ## Next Analysis 
 
 - Balance the data using either method. 
 - Then, using **caret** and either CV or Bootstrap, put several models in competition. 
-- Select the best one according to your choice of score. 
+- Select the best one according to the choice of score. 
 - Finally, use the test set to see if the best model does not overfit the training set.
 
 By doing this, we will have achieved a complete supervised learning task from A to Z.
