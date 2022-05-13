@@ -457,6 +457,61 @@ tab4
 The accuracy of the neural network is of 81.61% 
 
 
+### Gradient Boosting  
+The Gradient Boosting model accepts only numerical values so we have some transformation to do on our data in order to use it. 
+
+```{r}
+Gradient_boost.y_train <- as.integer(German_Credit.tr.subs$RESPONSE)-1
+Gradient_boost.y_test <- as.integer(German_credit.te$RESPONSE)-1
+
+Gradient_boost.X_train <- sparse.model.matrix(RESPONSE ~ .-1, 
+                                              data = German_Credit.tr.subs )
+Gradient_boost.X_test <- sparse.model.matrix(RESPONSE ~ .-1,
+                                             data = German_credit.te )
+
+```
+
+
+```{r}
+xgb_train <- xgb.DMatrix(data = Gradient_boost.X_train,
+                         label = Gradient_boost.y_train)
+
+xgb_test <- xgb.DMatrix(data = Gradient_boost.X_test, 
+                        label = Gradient_boost.y_test)
+
+xgb_params <- list(
+  booster = "gbtree",
+  eta = 0.01,
+  max_depth = 8,
+  gamma = 4,
+  subsample = 0.75,
+  colsample_bytree = 1,
+  objective = "multi:softmax",
+  eval_metric = "mlogloss",
+  num_class = 2
+)
+
+xgb_model <- xgb.train(
+  params = xgb_params,
+  data = xgb_train,
+  nrounds = 5000,
+  verbose = 1
+)
+
+xgb_model
+```
+
+
+```{r}
+xgb_preds <- predict(xgb_model, Gradient_boost.X_test, reshape = TRUE)
+
+# confusion matrix
+xgb_tab <- table(Obs=Gradient_boost.y_test, Pred=xgb_preds) 
+xgb_tab
+
+# accuracy
+(xgb_acc <- sum(diag(xgb_tab))/sum(xgb_tab)) 
+```
 
 
 ## Next Analysis 
