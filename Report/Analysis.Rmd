@@ -207,7 +207,7 @@ mod.logreg.sel <- step(logreg) # store the final model into mod.lm.sel
 summary(mod.logreg.sel)
 ```
 removed --> FURNITURE, RADIO.TV, EDUCATION, RETRAINING, MALE_DIV, MALE_SINGLE, MALE_MAR_or_WID, CO.APPLICANT, REAL_ESTATE, OWN_RES, NUM_CREDITS, JOB, NUM_DEPENDENTS
-In the end, we get the most significant model
+In the end, we get the most significant model: RAPPEL (Comment variable per variable)
 
 
 
@@ -418,6 +418,7 @@ confusionMatrix(data=German_credit.rb.tuned.pred,
 We have an accuracy of 0.696 and a balanced accuracy of 0.6975. 
 
 
+
 ### Neural network - Simple hyperparameter tuning
 
 To select the good parameters, we build a search grid and fit the model with each possible value in the grid. This is brute force and time consuming. The best model is selected among all the possible choices.
@@ -430,7 +431,7 @@ nnetGrid <-  expand.grid(size = seq(from = 1, to = 6, by = 1),
                         decay = seq(from = 0.1, to = 0.5, by = 0.1))
 
 nnetFit <- train(RESPONSE ~ ., 
-                 data = German_credit.tr,
+                 data = German_Credit.tr.subs,
                  method = "nnet",
                  metric = "Accuracy",
                  tuneGrid = nnetGrid,
@@ -441,19 +442,20 @@ nnetFit <- train(RESPONSE ~ .,
 ```{r}
 plot(nnetFit)
 ```
-The best Neural Networks parameters would be to choose (might be 3? to discuss) 4 hidden layers, with a decay of 0.3. 
+The best Neural Networks parameters would be to choose 3 hidden layers, with a decay of 0.4. 
 
 ```{r}
 set.seed(345)
-nn4 <- nnet(RESPONSE ~ ., data=German_credit.tr, size=4, decay = 0.3)
+nn4 <- nnet(RESPONSE ~ ., data=German_Credit.tr.subs, size=3, decay = 0.4)
 
 nn4_pred <- predict(nn4, type="class")
-tab4 <- table(Obs=German_credit.tr$RESPONSE, Pred=nn4_pred) # confusion matrix
+tab4 <- table(Obs=German_Credit.tr.subs$RESPONSE, Pred=nn4_pred) # confusion matrix
 tab4
 (acc4 <- sum(diag(tab4))/sum(tab4)) # accuracy
 
 ```
-The accuracy of the neural network is of 82.13% 
+The accuracy of the neural network is of 81.61% 
+
 
 
 
