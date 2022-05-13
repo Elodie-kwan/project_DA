@@ -196,6 +196,21 @@ From the confusion matrix summary, this model is better than the classification 
 
 !!! To check with normal data, it seems it is pretty good too !!!
 
+#### Variable selection and interpretation with step method (AIC criteria)
+
+The stepwise variable selection is performed. 
+
+```{r}
+step(logreg) # see the result
+
+mod.logreg.sel <- step(logreg) # store the final model into mod.lm.sel
+summary(mod.logreg.sel)
+```
+removed --> FURNITURE, RADIO.TV, EDUCATION, RETRAINING, MALE_DIV, MALE_SINGLE, MALE_MAR_or_WID, CO.APPLICANT, REAL_ESTATE, OWN_RES, NUM_CREDITS, JOB, NUM_DEPENDENTS
+In the end, we get the most significant model
+
+
+
 #### Variable importance for logistic regression
 
 ```{r}
