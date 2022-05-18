@@ -109,7 +109,9 @@ text(german.ct, cex = 0.6)
 rpart.plot(german.ct)
 ```
 
-The tree is quite big and we want to know if we can prune it. 
+We see that among the 31 explanatory variables, this model uses 6 of them: **CHK_ACCT**, **AMOUNT**, **HISTORY**, **DURATION**, **GUARANTOR** and **EMPLOYMENT**. 
+
+As the tree is quite big and we want to know if we can prune it. 
 
 #### Pruning the tree 
 
@@ -121,7 +123,7 @@ plotcp(german.ct)
 
 From the list of **cp** (complexity parameter), we would choose the line that has the lowest cross valiadation error. This can be seen on the column **xerror**. So the best cp would be 0.022422 with one split.  
 
-From the graph, we can identify that, according to the 1-SE rule, the tree with 2 and 3 are equivalent. The tree with 3 nodes should be preferred. Tt appears below the dotted-line. 
+From the graph, we can identify that, according to the 1-SE rule, the tree with 2 and 3 are equivalent. The tree with 3 nodes should be preferred. It appears below the dotted-line. 
 
 The value of cp can be chosen arbitrarily between 0.018 and 0.095. So we decided to go with the suggested cp of 0.022 from the summary. 
 
@@ -130,7 +132,9 @@ german.ct.prune <- prune(german.ct, cp=0.022)
 rpart.plot(german.ct.prune)
 ```
 
-Using the pruned tree we made by hand, we can compute the prediction and build a confusion matrix.
+This pruned decision tree with a cp of 0.022 uses the variables **CHK_ACCT** and **HISTORY**. 
+
+Using this pruned tree we made by hand, we can compute the prediction and build a confusion matrix.
 
 ```{r}
 german.ct.prediction <- predict(german.ct.prune, newdata=German_credit.te, type="class")
@@ -141,7 +145,6 @@ confusionMatrix(data=german.ct.prediction, reference = German_credit.te$RESPONSE
 
 The accuracy of the classification tree model is not really good (0.564), however we see that the balanced accuracy (0.6345) is a little bit better but still not enough. 
 
-
 We decide to also look at what would an automatically pruned using 1-SE rule would give use and compare the model. 
 ```{r}
 set.seed(1234)
@@ -149,6 +152,10 @@ german.ct.autoprune <- autoprune(RESPONSE ~ ., method = "class",
                                  data = German_Credit.tr.subs)
 rpart.plot(german.ct.autoprune )
 ```
+
+
+Here, only the variable **CHK_ACCT** is used. 
+
 
 ```{r}
 german.ct.autoprune.prediction <- predict(german.ct.autoprune,
@@ -170,6 +177,10 @@ varImp(german.ct.prune)
 vip(german.ct.prune)
 ```
 
+From this plot, we see that the variables that influences the most are **CHK_ACCT**, **HISTORY**, **SAV_ACCT**, **DURATION**, **AMOUNT** and **REAL_ESTATE**. They are not exactly the same as the one we saw above.
+
+The variable **CHK_ACCT** and **HISTORY** were noticed though. 
+
 
 ### Fitting another model : Logistic Regression 
 ```{r}
@@ -178,6 +189,7 @@ logreg <- glm(RESPONSE~., data = German_Credit.tr.subs, family= binomial)
 summary(logreg)
 ```
 
+We see that a lot of variables are not statistically significant for the model so we can think of a model reduction.
 
 We can predict using the logistic regression. 
 
@@ -194,7 +206,6 @@ confusionMatrix(data=as.factor(german.logrer.pred),
 
 From the confusion matrix summary, this model is better than the classification tree as the accuracy is higher (0.704) and that the balanced accuracy seems to be almost good as well ( 0.6852)
 
-!!! To check with normal data, it seems it is pretty good too !!!
 
 #### Variable selection and interpretation with step method (AIC criteria)
 
@@ -203,12 +214,40 @@ The stepwise variable selection is performed.
 ```{r}
 step(logreg) # see the result
 
-mod.logreg.sel <- step(logreg) # store the final model into mod.lm.sel
+mod.logreg.sel <- step(logreg) # store the final model into mod.logreg.sel
 summary(mod.logreg.sel)
 ```
-removed --> FURNITURE, RADIO.TV, EDUCATION, RETRAINING, MALE_DIV, MALE_SINGLE, MALE_MAR_or_WID, CO.APPLICANT, REAL_ESTATE, OWN_RES, NUM_CREDITS, JOB, NUM_DEPENDENTS
-In the end, we get the most significant model: RAPPEL (Comment variable per variable)
 
+
+The variables that have been removed are : **FURNITURE**, **RADIO.TV**, **EDUCATION**, **RETRAINING**, **MALE_DIV**, **MALE_SINGLE**, **MALE_MAR_or_WID**, **CO.APPLICANT**, **REAL_ESTATE**, **OWN_RES**, **NUM_CREDITS**, **JOB** and **NUM_DEPENDENTS**
+
+In the end, we get the most significant model: 
+
+$$ RESPONSE = -0.6339113 + 0.5970566 * CHK_{ACCT1} + 1.1123874 * CHK_{ACCT2} + 2.4109175 * CHK_{ACCT3} - 0.6393459 * HISTORY1 + 0.3153810 * HISTORY2 + 0.0245812 * HISTORY3 + 1.0638624 * HISTORY4 - 0.7159178 * NEW_{CAR1} + 1.3489217 * USED_{CAR1}  -0.8489518 * RETRAINING1 - 0.0002631 * AMOUNT + 0.5675624 * SAV_{ACCT1} - 0.0693577 * SAV_{ACCT2} + 0.5603771 * SAV_{ACCT3} + 1.3592948 * * SAV_{ACCT4} + 0.5542570 * EMPLOYMENT1 + 1.2338686 * EMPLOYMENT2 + 1.7999683 * EMPLOYMENT3 + 1.5521376 * EMPLOYMENT4 - -0.3278020 * INSTALL_{RATE} + 1.6927223 * GUARANTOR1 - 1.1117822 * PRESENT_{RESIDENT2} - 0.3408387 * PRESENT_{RESIDENT3} - 0.7613632 * PRESENT_{RESIDENT4} - 1.0532655 * PROP_{UNKN_NONE1} + 0.0181856 * AGE - 0.6281982 * OTHER_{INSTALL1} - 0.8736712 * RENT1 + 0.5251823 * TELEPHONE + 1.2896516 * FOREIGN $$
+
+$$ p = (e^{RESPONSE})/(1 + e^{RESPONSE})$$
+
+It means that : 
+
++ The predicted probability of being a good applicant for **CHCK_ACCT3** is higher than for **CHK_ACCT0** (and also higher than for **CHK_ACCT1** and **CHK_ACCT2**).
++ The predicted probability of being a good applicant for **HISTORY1** is lower than for **HISTORY0**.
++ The predicted probability of being a good applicant for **HISTORY4** is higher than for **HISTORY0** (and also higher than for **HISTORY2** and **HISTORY3**).
++ The predicted probability of being a good applicant for **NEW_CAR1** is lower than for **NEW_CAR0**.
++ The predicted probability of being a good applicant for **USED_CAR1** is higher than for **USED_CAR0**.
++ The predicted probability of being a good applicant for **RETRAINING1** is lower than for **RETRAINING0**.
++ **AMOUNT** is negatively associated with **RESPONSE**.
++ The predicted probability of being a good applicant for **SAV_ACCT4** is higher than for **SAV_ACCT0** (and also higher than for **SAV_ACCT1** and **SAV_ACCT3**).
++ The predicted probability of being a good applicant for **SAV_ACCT2** lower than for **SAV_ACCT0**.
++ The predicted probability of being a good applicant for **EMPLOYMENT3** is higher than for **Employment0** (and also higher than for **EMPLOYMENT1**, **EMPLOYMENT2** and **EMPLOYMENT4**).
++ **INSTALL_RATE** is negatively associated with **RESPONSE**.
++ The predicted probability of being a good applicant for **GUARANTOR1 ** is higher than for **GUARANTOR0**.
++ The predicted probability of being a good applicant for **PRESENT_RESIDENT2** is lower than for **PRESENT_RESIDENT0** (and also lower than **PRESENT_RESIDENT3** and **PRESENT_RESIDENT4**).
++ The predicted probability of being a good applicant for **PROP_UNKN_NONE1** is lower than for **PROP_UNKN_NONE0**.
++ **AGE** is positively associated with **RESPONSE**.
++ The predicted probability of being a good applicant for **OTHER_INSTALL1** is lower than for **OTHER_INSTALL0**.
++ The predicted probability of being a good applicant for **RENT1** is lower than for **RENT0**.
++ The predicted probability of being a good applicant for **TELEPHONE1** is higher than for **TELEPHONE0**.
++ The predicted probability of being a good applicant for **FOREIGN1** is higher than for **FOREIGN0**.
 
 
 #### Variable importance for logistic regression
@@ -217,7 +256,7 @@ In the end, we get the most significant model: RAPPEL (Comment variable per vari
 x_train <- select(German_Credit.tr.subs, -RESPONSE)
 y_train <- pull(German_Credit.tr.subs, RESPONSE)
 
-explainer_logreg <- explain(model = logreg, 
+explainer_logreg <- explain(model = mod.logreg.sel, 
                                data = x_train, 
                                y = as.numeric(y_train), 
                                label = "Logistic Regression")
@@ -228,9 +267,10 @@ plot(importance_logreg)
 ```
 
 ```{r}
-vip(logreg)
+vip(mod.logreg.sel)
 ```
 
+Listed above are the most important variables for the logarithmic regression we reduced. 
 
 ### Fitting another model : KNN
 To perform a k-nearest neighbor method, we do not need to balance the data so we will use the unbalanced training set.
@@ -243,19 +283,20 @@ German_credit.num.response <- German_credit_cleaned %>%
 ```
 
 ```{r}
+set.seed(123)
 ## build the K-NN model with k = 2 
 German_credit.knn <- knn3(data=German_credit.num.response, RESPONSE~., k=2) 
 
 German_credit.knn.pred <- predict(German_credit.knn, 
-                                  newdata = German_credit.num.response, type="class")
-
-German_credit.knn.pred
+                                  newdata = German_credit.num.response,
+                                  type="class")
 ```
 
 Now we can use the 2-NN to predict the test set using the training set. 
 Note that the model is fitting on the training set and the predictions are computed on the test set.
 
 ```{r}
+set.seed(123)
 # applying Knn model with k = 2 on the training set
 German_credit.knn.tr <- knn3(data=German_credit.tr, RESPONSE~., k=2)  
 
@@ -263,7 +304,7 @@ German_credit.knn.tr.pred <- predict(German_credit.knn.tr,
                                      newdata = German_credit.te, type="class")
 ```
 
-To compare the predictions above and the true species (the one in the test set), we can build a table. It is called a **confusion matrix** (again, this will be detailed later on).
+To compare the predictions above and the true state of the applicant (the one in the test set), we can build a table. It is called a **confusion matrix** (again, this will be detailed later on).
 
 ```{r}
 table(Pred=German_credit.knn.tr.pred, Observed=German_credit.te$RESPONSE)
@@ -271,8 +312,8 @@ table(Pred=German_credit.knn.tr.pred, Observed=German_credit.te$RESPONSE)
 
 The table is read as follow : 
 
-+ We predicted 13 Bad credits and there were indeed 13 observed Bad credits. But the prediction misjudges 45 good credits by predicting bad credits.
-+ We predicted 143 Good credits as it was in fact a Good credits 
++ We predicted 21 Bad credits and there were indeed 21 observed Bad credits. But the prediction misjudges 45 good credits by predicting bad credits.
++ We predicted 128 Good credits as it was in fact a Good credits but 56 where predicted as Good while it was in fact Bad. 
 
 ```{r}
 # Confusion Matrix
@@ -280,11 +321,12 @@ confusionMatrix(data=German_credit.knn.tr.pred,
                 reference = German_credit.te$RESPONSE)
 ```
 
-The accuracy (0.6) and the unbalanced accuracy (0.5020) are both a bit too low. 
+The accuracy (0.596) and the unbalanced accuracy (0.5063) are both too low. 
 
 The prediction is not perfect. We need to try to improve the prediction by changing K at that point. Therefore, we use K=3.
 
 ```{r}
+set.seed(123)
 # applying Knn model with k = 3 on the training set
 German_credit.knn3.tr <- knn3(data=German_credit.tr, RESPONSE~., k=3)  
 
@@ -293,6 +335,11 @@ German_credit.knn3.tr.pred <- predict(German_credit.knn3.tr,
 
 table(Pred=German_credit.knn3.tr.pred, Observed=German_credit.te$RESPONSE)
 ```
+
+The table is read as follow : 
+
++ We predicted 14 Bad credits and they were indeed observed Bad credits. But the prediction misjudges 28 good credits by predicting bad credits.
++ We predicted 145 Good credits as it was in fact a Good credits but 6 where predicted as Good while it was in fact Bad. 
 
 
 ```{r}
@@ -324,6 +371,7 @@ confusionMatrix(data=German_credit.svm.pred, reference = German_credit.te$RESPON
 ```
 
 The accuracy (0.692) and the balanced accuracy (0.6802) are lower than 0.75 which means that it might not be good enough. 
+
 
 ### Radial basis Support Vector Machine
 We try now with a radial basis kernel (the default).
@@ -473,6 +521,7 @@ Gradient_boost.X_test <- sparse.model.matrix(RESPONSE ~ .-1,
 
 
 ```{r}
+set.seed(123)
 xgb_train <- xgb.DMatrix(data = Gradient_boost.X_train,
                          label = Gradient_boost.y_train)
 
@@ -489,14 +538,14 @@ xgb_params <- list(
   objective = "multi:softmax",
   eval_metric = "mlogloss",
   num_class = 2
-)
+  )
 
 xgb_model <- xgb.train(
   params = xgb_params,
   data = xgb_train,
   nrounds = 5000,
   verbose = 1
-)
+  )
 
 xgb_model
 ```
@@ -513,12 +562,14 @@ xgb_tab
 (xgb_acc <- sum(diag(xgb_tab))/sum(xgb_tab)) 
 ```
 
-Here we have an accuracy of 68.8%. It is good but there is room for improvement. 
+Here we have an accuracy of 68.4%. It is good but there is room for improvement. 
 
 ```{r}
 confusionMatrix(data=as.factor(xgb_preds), 
                 reference = as.factor(Gradient_boost.y_test))
 ```
+
+
 
 
 ## Next Analysis 
