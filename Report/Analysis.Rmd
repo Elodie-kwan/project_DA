@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r echo=FALSE, message=FALSE}
-source(here::here("scripts/setup.R"))
+source("../scripts/setup.R")
 ```
 
 ### Import libraries and data
@@ -511,6 +511,13 @@ xgb_tab
 
 # accuracy
 (xgb_acc <- sum(diag(xgb_tab))/sum(xgb_tab)) 
+```
+
+Here we have an accuracy of 68.8%. It is good but there is room for improvement. 
+
+```{r}
+confusionMatrix(data=as.factor(xgb_preds), 
+                reference = as.factor(Gradient_boost.y_test))
 ```
 
 
