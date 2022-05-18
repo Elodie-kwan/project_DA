@@ -8,7 +8,7 @@ packages <- c(
 "psych", "rpart", "gridExtra", "summarytools",
 "dplyr",  "ggplot2", "factoextra", "rpart.plot",
 "adabag", "caret","e1071", 
-"DALEX", "vip",
+"DALEX", "vip", "nnet",
 "xgboost", "caTools", "Matrix"
 )
 
