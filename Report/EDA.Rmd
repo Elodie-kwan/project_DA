@@ -208,9 +208,23 @@ summary(German_credit.pca)
 
 From the PCA summary we can see 4 principal components should be taken into account in order to explain approximately 81% of the variation of the data.
 
-```{r}
-fviz_eig(German_credit.pca)
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(FactoMineR)
+resultats_pca <- PCA(German_credit.num, scale.unit = TRUE, ncp = 5, graph = FALSE)
 ```
+
+#### Eigenvalue analysis:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+eig.val <- get_eigenvalue(resultats_pca)
+eig.val
+```
+Need to choose 3 dimensions according to eigenvalues. Dim1/2/3 > 1
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, out.width = "100%", fig.align="center"}
+fviz_eig(resultats_pca, addlabels = TRUE)
+```
+
 
 ```{r}
 fviz_pca_ind(German_credit.pca,
@@ -235,14 +249,17 @@ From this circle of correlations, we see that :
 + The first principal component PC1 is strongly positively correlated with the variables **AMOUNT** and **DURATION**. So the larger PC1, the larger these features. It is also a little bit negatively correlated with **INSTALL_RATE**.  
 + The second principal component PC2 is strongly positively correlated with **AGE**, **NUM_DEPENDENTS** and **NUM_CREDITS**. 
 
-```{r}
-fviz_pca_biplot(German_credit.pca, repel = TRUE,
-                col.var = "#2E9FDF", 
-                col.ind = "#696969"  
-                )
-```
 
 From this biplot, we can see some characteristics of the observations.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=9,fig.height=7, out.width = "120%", fig.align="center"}
+fviz_pca_biplot(resultats_pca, repel = TRUE,
+                col.var = "blue", # Couleur des variables
+                habillage= German_credit$RESPONSE)
+```
+Here, we can see the distribution of the response variables (0-1) according to the reduced dimension. What we can observe, is that the Bad credits: 0, look a little bit more positively correlated ot dimension 1. Therefore, more correlated to Amount and Duration. 
+Compared to Good Credits, it looks positively correlated to dimesion 2; AGE, Num_Credits, Num_dependents.
+
 
 
 We can export the dataset as we have made some modifications. It will be easier for the other files. 
@@ -250,6 +267,3 @@ We can export the dataset as we have made some modifications. It will be easier 
 ```{r}
 # write.csv(German_credit,"./../Data_DA/GermanCredit_cleaned.csv", row.names = FALSE)
 ```
-
-
-
