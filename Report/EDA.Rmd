@@ -8,10 +8,6 @@ output:
     df_print: paged
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 ```{r echo=FALSE}
 source(here::here("scripts/setup.R"))
 ```

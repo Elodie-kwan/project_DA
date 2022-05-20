@@ -5,10 +5,6 @@ date: '2022-04-26'
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 Homework 1: The German Credit data.
 
 Description: The German credit databset contains 1000 of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** or **Bad Credit**: Therefore, the response variable, studied, is the credit rating. 
