@@ -9,3 +9,29 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Homework 1: The German Credit data.
+
+Description: The German credit databset contains 1000 of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** or **Bad Credit**: Therefore, the response variable, studied, is the credit rating. 
+
+Response variable: **RESPONSE** in the dataset
+0 -> Bad credit 
+1 -> Good credit
+
+All the other observations are features of the applicants that are going to be studied in order to better classify the new applicants. Our goal is to implement the best classifying model to determine the credit rating as accurate as possible. To do that, we will go through many machine learning models and deploy the CRISP-DM model to solve this problem.
+
+Report structure:
+
+1/ Data Cleaning: Sorting the dataset to make it ready for the analysis
+
+2/ Exploratory Data Analysis; EDA: Studing the dataset and the variables, one by one, plus a PCA
+
+3/ Analysis: 
+  a) Splitting the dataset
+  b) Balancing the data
+  c) Fitting the models
+  d) Accuracy study (scoring)
+  e) Variable selection and importance
+  f) Cross-validation / Bootstrap
+  g) Final Best model 
+  
+4/ Conclusion: is there a accurate model that can determine the credit rating of new applicants ? If Yes which one ? Is there some limitations in this model?
