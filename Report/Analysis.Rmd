@@ -98,14 +98,19 @@ summary(german.ct)
 Then we plot the classification tree. 
 
 ```{r}
-par(pty = "s", mar = c(1, 1, 1, 1))
-plot(german.ct, cex = 1)
-text(german.ct, cex = 0.6)
-
 rpart.plot(german.ct)
 ```
 
 We see that among the 31 explanatory variables, this model uses 6 of them: **CHK_ACCT**, **AMOUNT**, **HISTORY**, **DURATION**, **GUARANTOR** and **EMPLOYMENT**. 
+```{r}
+german.bigct.prediction <- predict(german.ct, 
+                                   newdata=German_credit.te,
+                                   type="class")
+
+confusionMatrix(data=german.bigct.prediction , reference = German_credit.te$RESPONSE)
+
+```
+
 
 As the tree is quite big and we want to know if we can prune it. 
 
@@ -254,6 +259,18 @@ It means that :
 + The predicted probability of being a good applicant for **FOREIGN1** is higher than for **FOREIGN0**.
 
 
+```{r}
+german.logregsel.pred_prob <- predict(mod.logreg.sel, newdata = German_credit.te,
+                                    type="response")
+
+german.logregsel.pred <- ifelse(german.logregsel.pred_prob  >= 0.5, 1, 0)
+
+# Confusion Matrix
+confusionMatrix(data=as.factor(german.logregsel.pred),
+                reference = German_credit.te$RESPONSE)
+```
+
+
 #### Variable importance for logistic regression
 
 ```{r}
@@ -310,10 +327,6 @@ German_credit.knn.tr.pred <- predict(German_credit.knn.tr,
 
 To compare the predictions above and the true state of the applicant (the one in the test set), we can build a table. It is called a **confusion matrix** (again, this will be detailed later on).
 
-```{r}
-table(Pred=German_credit.knn.tr.pred, Observed=German_credit.te$RESPONSE)
-```
-
 The table is read as follow : 
 
 + We predicted 21 Bad credits and there were indeed 21 observed Bad credits. But the prediction misjudges 45 good credits by predicting bad credits.
@@ -336,8 +349,6 @@ German_credit.knn3.tr <- knn3(data=German_credit.tr, RESPONSE~., k=3)
 
 German_credit.knn3.tr.pred <- predict(German_credit.knn3.tr, 
                                       newdata = German_credit.te, type="class")
-
-table(Pred=German_credit.knn3.tr.pred, Observed=German_credit.te$RESPONSE)
 ```
 
 The table is read as follow : 
@@ -365,9 +376,6 @@ The accuracies might still be a bit low.
 German_credit.svm <- svm(RESPONSE ~ ., data=German_Credit.tr.subs, kernel="linear")
 German_credit.svm
 German_credit.svm.pred <- predict(German_credit.svm, newdata = German_credit.te)
-
-# confusion matrix 
-table(Pred=German_credit.svm.pred, obs=German_credit.te$RESPONSE)
 ```
 
 ```{r}
@@ -426,6 +434,17 @@ plot(svm_Linear_Grid)
 svm_Linear_Grid$bestTune
 ```
 
+```{r}
+German_credit.lsvm.tuned <- svm(RESPONSE ~ .,data = German_Credit.tr.subs,
+                              kernel = "linear", 
+                              cost = svm_Linear_Grid$bestTune$C)
+
+German_credit.lsvm.tuned.pred <- predict(German_credit.lsvm.tuned, 
+                                       newdata = German_credit.te)
+
+confusionMatrix(data=German_credit.lsvm.tuned.pred, 
+                reference = German_credit.te$RESPONSE)
+```
 
 ### Tunning the hyperparameters of Radial basis SVM
 
@@ -500,10 +519,10 @@ The best Neural Networks parameters would be to choose 3 hidden layers, with a d
 set.seed(345)
 nn4 <- nnet(RESPONSE ~ ., data=German_Credit.tr.subs, size=3, decay = 0.4)
 
-nn4_pred <- predict(nn4, type="class")
-tab4 <- table(Obs=German_Credit.tr.subs$RESPONSE, Pred=nn4_pred) # confusion matrix
-tab4
-(acc4 <- sum(diag(tab4))/sum(tab4)) # accuracy
+nn4_pred <- predict(nn4, newdata = German_credit.te, type="class")
+
+confusionMatrix(data= as.factor(nn4_pred), 
+                reference = German_credit.te$RESPONSE)
 
 ```
 The accuracy of the neural network is of 81.61% 
@@ -557,13 +576,6 @@ xgb_model
 
 ```{r}
 xgb_preds <- predict(xgb_model, Gradient_boost.X_test, reshape = TRUE)
-
-# confusion matrix
-xgb_tab <- table(Obs=Gradient_boost.y_test, Pred=xgb_preds) 
-xgb_tab
-
-# accuracy
-(xgb_acc <- sum(diag(xgb_tab))/sum(xgb_tab)) 
 ```
 
 Here we have an accuracy of 68.4%. It is good but there is room for improvement. 
@@ -593,10 +605,8 @@ The 10-CV can be easily obtained from **caret**.
 First, set up the splitting data method using the **trainControl** function.
 
 ```{r}
+set.seed(123)
 German_Credit.trctrl <- trainControl(method = "cv", number=10)
-```
-
-```{r}
 German.Credit.cv <- train(RESPONSE ~., data = German_credit.tr,
                 method = "glmStepAIC", 
                 family="binomial",
@@ -606,9 +616,9 @@ German.Credit.cv
 
 
 ```{r}
-German_Credit.pred <- predict(German.Credit.cv, newdata = German_credit.te)
+German_Credit.cv.pred <- predict(German.Credit.cv, newdata = German_credit.te)
 
-confusionMatrix(data=German_Credit.pred, reference = German_credit.te$RESPONSE)
+confusionMatrix(data=German_Credit.cv.pred, reference = German_credit.te$RESPONSE)
 ```
 
 
@@ -621,7 +631,7 @@ We only need to change the method in the **trainControl** function. The correspo
 100 replicates is veryyyy long to run... can do that on less sample ?? I put 10, takes 3 minutes for me
 
 ```{r cache = TRUE}
-
+set.seed(123)
 trctrl <- trainControl(method = "boot632", number=10)
 German_credit.boot <- train(RESPONSE ~., data = German_credit.tr,
                             method = "glmStepAIC", family="binomial",
@@ -629,4 +639,14 @@ German_credit.boot <- train(RESPONSE ~., data = German_credit.tr,
 
 German_credit.boot
 ```
+
+
+```{r}
+German_Credit.boot.pred <- predict(German_credit.boot, newdata = German_credit.te)
+
+confusionMatrix(data=German_Credit.boot.pred, reference = German_credit.te$RESPONSE)
+```
+
+
+
 
