@@ -14,16 +14,7 @@ packages <- c(
 
 purrr::walk(packages, library, character.only = TRUE)
 
-opts_chunk$set(collapse = TRUE,
-               cache = FALSE,
-               message = FALSE,
-               echo = FALSE,
-               warning=FALSE,
-               fig.align = "center",
-               fig.width = 8,
-               fig.asp = 0.618,
-               fig.show = "hold"
-)
+
 
 
 # function that calculates variable importance 
