@@ -17,7 +17,7 @@ TBD
 In the bank industry many bankers have to decided whether or not they should issue a loan to a new coming applicant. In this report, we will use the data set called **German Credit data** which was given to us. 
 
 
-The German credit data set contains 1000 observations of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** or **Bad Credit**: Therefore, the response variable, studied, is the credit rating. 
+The German credit data set contains 1000 observations of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** risk or **Bad Credit** risk: Therefore, the response variable, studied, is the credit rating. 
 
 
 Response variable: **RESPONSE** in the dataset:
@@ -26,7 +26,7 @@ Response variable: **RESPONSE** in the dataset:
 + 1 : Good credit. In case of good credit, the banker will want to issue loan to this applicant as it is more likely that the company will benefit from it. 
 
 
-All the other observations are features of the applicants that are going to be studied. It will allow us to perform several machine learning models and deploy a CRISP-DM model to come up with the best classifying model with the highest accuracy as possible. We want to determine whether the new applicant is a 'Good' one, in which case the loan should be issued, or a 'Bad' one, in which case it is not advisable to give him a loan.
+All the other observations are features of the applicants that are going to be studied. It will allow us to perform several machine learning models and deploy a CRISP-DM model to come up with the best classifying model with the highest accuracy as possible. We want to determine whether the new applicant has a 'Good' credit risk, in which case the loan should be issued, or a 'Bad' credit risk, in which case it is not advisable to give him a loan.
 
 
 The tasks required to perform our analysis is stated as follow. 

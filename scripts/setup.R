@@ -7,7 +7,7 @@ packages <- c(
 "tidyverse", "readxl", "Hmisc", "DataExplorer", 
 "psych", "rpart", "gridExtra", "summarytools",
 "dplyr",  "ggplot2", "factoextra", "rpart.plot",
-"adabag", "caret","e1071", 
+"FactoMineR", "adabag", "caret","e1071", 
 "DALEX", "vip", "nnet",
 "xgboost", "caTools", "Matrix", 'FactoMineR'
 )

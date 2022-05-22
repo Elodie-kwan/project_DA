@@ -8,44 +8,38 @@ output:
     df_print: paged
 ---
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 source(here::here("scripts/setup.R"))
 ```
 
-In this section, we will proceed to an exploratory data analysis of the **German Credit data**. 
+Our very first steps once we received the **German Credit data** was to dig into it and get to know the observations and features we were going to work with. 
 
-Let's start by importing the dataset. 
-```{r}
+```{r include = FALSE}
 German_credit <- read.csv("./../Data_DA/GermanCredit.csv", header = TRUE, sep = ";")
 ```
 
 
 ## Get to know the data 
 
-### Title : german credit data 
-### Name of the file : GermanCredit.cvs
-### Abstract
-The German Credit data has data on 1000 past credit applicants, described by 30 variables. Each applicant is rated as "Good" or "Bad" credit (encoded as 1 and 0 respectively in the response variable). 
+The title of the dataset is *German credit data* and the name of the file is **GermanCredit.cvs**. 
 
 
-**Goal** : We want to obtain a model that may be used to determine if new applicants present a good or bad credit risk
+As said in the introduction, the German Credit data has data on 1000 observations on past credit applicants and it is described by 30 attributes. Each applicant is rated as "Good" or "Bad" credit (encoded as 1 and 0 respectively in the **RESPONSE** variable). 
 
-+ Number of instances : 1000
-+ Number of attributes : 30
-+ Attribute Information :
+We looked at the attribute Information :
 
-```{r}
+```{r echo = FALSE}
 str(German_credit)
 
 summary(German_credit)
 ```
 
-We notice that the variable **EDUCATION** has a minimum value of '-1' but it should be '0' since there are only 2 levels (0 and 1). Indeed, the observation 37 indicate a value of '-1' for **EDUCATION**. 
+We noticed that the variable **EDUCATION** has a minimum value of '-1' but it should be '0' since there are only 2 levels (0 and 1). Indeed, the observation 37 indicate a value of '-1' for **EDUCATION**. 
 We notice another strange value, in the variable **GUARANTOR**, the maximum value is of '2' while it does not mean anything in our data set. 
 
-After discussion with the Banker, he gave us the correct values to these 2 mistakes. Observation 37 of **EDUCATION** and observation 234 of **GUARANTOR** should be equal to 1.
+After discussion with the Banker, he gave us the correct values to these 2 mistakes. Observation 37 of **EDUCATION** and observation 234 of **GUARANTOR** should be equal to 1. We corrected these two values. 
 
-```{r}
+```{r echo = FALSE}
 German_credit$EDUCATION[37] <- 1
 German_credit$EDUCATION <- as.factor(German_credit$EDUCATION)
 
@@ -54,31 +48,30 @@ German_credit$GUARANTOR <- as.factor(German_credit$GUARANTOR)
 ```
 
 
-We see that the variable **AGE** has a maximum of 125. This is strange because it is very unlikely that someone lives to the age of 125. We talked to the banker and he confirmed our doubts by telling us that a mistake has been made. At the observation 537, the correct age of the client is 75 years old. He asks us to correct this value in our data set. 
+We also saw that the variable **AGE** has a maximum of 125. This is strange because it is very unlikely that someone lives to the age of 125. We talked to the banker again and he confirmed our doubts by telling us that a mistake has been made. At the observation 537, the correct age of the client is 75 years old. He asked us to correct this value in our data set. 
 
-```{r}
+```{r echo = FALSE}
 German_credit$AGE[537] <- 75
 ```
 
 
-+ There are no missing values.
+After looking at the different attributes, we concluded that there were no missing values. 
  
-```{r}
+```{r include = FALSE }
 which(is.na(German_credit))
 ```
 
-+ The response variable is the '**Response**' variable - last column on the data. 
+The response variable is identified as being the column named '**Response**' and it apprears to be the last column on the data. 
  
-Response variable : credit rating is good
+It is a dummy variable with 0/1. 
  
-1. 0 : No
+  1. 0 : No, the credit rating is bad. 
+  2. 1 : Yes, the credit rating is good.
 
-2. 1 : Yes
 
+We had to make sure that the class of the variables are correct. As described above, all the variables are defined as *integer* but we know that we should have numerical and categorical variables in our dataset. Therefore, we have to transform the class of some of them.
 
-We have to make sure that the class of the variables are correct. As described above, all the variables are defined as *integer* but we know that we should have numerical and categorical variables in our dataset. Therefore, we have to transform the class of some of them.
-
-```{r}
+```{r echo = FALSE}
 German_credit$DURATION <- as.numeric(German_credit$DURATION)
 German_credit$AMOUNT <- as.numeric(German_credit$AMOUNT)
 German_credit$INSTALL_RATE <- as.numeric(German_credit$INSTALL_RATE)
@@ -98,9 +91,9 @@ str(German_credit)
 The binomial data are set as factors and the others as numerical. 
 
 
-We can now describe the variables one more time and we should get better results.  
+We then described the variables one more time and we should get better results.  
 
-```{r}
+```{r echo = FALSE}
 describe(German_credit)
 introduce(German_credit)
 
@@ -110,10 +103,10 @@ plot_intro(German_credit)
 The plot helps us to see the percentage of continuous variable, the percentage of discrete variables and whether or not some observations are missing. 
 
 
-## Visualization of the data 
+### Visualization of the data 
 First, we plot all the continuous variables into histograms and their corresponding density plots. 
 
-```{r}
+```{r echo = FALSE}
 plot_histogram(German_credit)
 plot_density(German_credit)
 ```
@@ -122,7 +115,7 @@ Our first notice is that the data are not really normally distributed. Some of t
 
 We can look at the tails and outliers more carefully through boxplots. 
 
-```{r}
+```{r echo = FALSE}
 plot_boxplot(German_credit, by = 'RESPONSE',  ncol = 2,
              title = "Side-by-side boxplots")
 ```
@@ -131,7 +124,7 @@ This seems not to be disturbing. It makes sense that only a few people has a big
 
 Now, we can make some barplots of the categorical variables.
 
-```{r}
+```{r echo = FALSE, fig.show="hold", out.width="50%"}
 for (i in 1:ncol(German_credit)){
   if (class(German_credit[,i])=="factor"){
     print(ggplot(German_credit) +
@@ -153,22 +146,23 @@ From those barplots we can see:
 
 A general summary can be done. 
 
-```{r}
+```{r echo = FALSE}
 dfSummary(German_credit, style = 'grid')
 ```
 
 
-### Correlation plot : 
+#### Correlation Analysis : 
 
 Correlation plot between continuous variables : 
-```{r}
+
+```{r echo = FALSE}
 plot_correlation(German_credit, type= 'c', cor_args = list( 'use' = 'complete.obs'))
 ```
 
 There are little correlation between the continuous variables. We can notice that there is a correlation of 62% between the variable **DURATION** and **AMOOUNT**. This makes sense and is known by the bankers that the bigger the amount of credit, the longer the duration of the credit in months will last. 
 
 Correlation plot between categorical variables : 
-```{r}
+```{r echo = FALSE, message=FALSE, warning=FALSE}
 plot_correlation(German_credit, type= 'd')
 ```
 
@@ -187,17 +181,17 @@ We can also see some correlation between **RESPONSE 0**:
 + and people that have an average balance in savings account < 100 DM (SAV_ACCT_0)
 + and the variable _REAL_ESTATE_ (REAL_ESTATE)
 
-### PCA Exploration:
+#### Principal Component Analysis Exploration:
 It is good to perform a PCA Exploration in order to reduce the dimensions or/and see which variables to select. 
 
-We start by selecting the numerical values:
+We start by selecting the numerical values because the PCA only works on numerical variables. 
 
-```{r}
+```{r echo = FALSE}
 German_credit.num <- German_credit %>% 
   select('DURATION', 'AMOUNT', 'INSTALL_RATE', 'AGE', 'NUM_CREDITS','NUM_DEPENDENTS')
 ```
 
-```{r}
+```{r echo = FALSE}
 German_credit.pca <- prcomp(German_credit.num, center = TRUE, scale = TRUE)
 summary(German_credit.pca)
 ```
@@ -205,7 +199,6 @@ summary(German_credit.pca)
 From the PCA summary we can see 4 principal components should be taken into account in order to explain approximately 81% of the variation of the data.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-library(FactoMineR)
 resultats_pca <- PCA(German_credit.num, scale.unit = TRUE, ncp = 5, graph = FALSE)
 ```
 
@@ -215,14 +208,15 @@ resultats_pca <- PCA(German_credit.num, scale.unit = TRUE, ncp = 5, graph = FALS
 eig.val <- get_eigenvalue(resultats_pca)
 eig.val
 ```
-Need to choose 3 dimensions according to eigenvalues. Dim1/2/3 > 1
+
+Then from this eigenvalues table, we know that we need to choose 3 dimensions because the first 3 dimensions are higher than the value 1. 
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, out.width = "100%", fig.align="center"}
 fviz_eig(resultats_pca, addlabels = TRUE)
 ```
 
 
-```{r}
+```{r echo = FALSE, message=FALSE, warning=FALSE}
 fviz_pca_ind(German_credit.pca,
              col.ind = "cos2", # Colorer par le cos2
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
@@ -231,7 +225,7 @@ fviz_pca_ind(German_credit.pca,
 
 ```
 
-```{r}
+```{r echo = FALSE, message=FALSE, warning=FALSE}
 fviz_pca_var(German_credit.pca,
              col.var = "contrib", 
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
@@ -253,13 +247,19 @@ fviz_pca_biplot(resultats_pca, repel = TRUE,
                 col.var = "blue", # Couleur des variables
                 habillage= German_credit$RESPONSE)
 ```
+
 Here, we can see the distribution of the response variables (0-1) according to the reduced dimension. What we can observe, is that the Bad credits: 0, look a little bit more positively correlated ot dimension 1. Therefore, more correlated to Amount and Duration. 
-Compared to Good Credits, it looks positively correlated to dimesion 2; AGE, Num_Credits, Num_dependents.
+Compared to Good Credits, it looks positively correlated to dimesion 2; **AGE**, **NUM_CREDITS**, **NUM_DEPENDENTS**.
 
 
+After having cleaned the dataset and looked at all the different features, we created a new dataset that contains our modifications in order to use it for our analysis. 
 
-We can export the dataset as we have made some modifications. It will be easier for the other files. 
+```{r echo = FALSE}
 
-```{r}
+## This line of code has been put into comments so that we do not rewrite a new 
+## dataset when we run the code.
+
 # write.csv(German_credit,"./../Data_DA/GermanCredit_cleaned.csv", row.names = FALSE)
 ```
+
+
