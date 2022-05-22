@@ -127,7 +127,7 @@ We first have an insight on how well it predict the test set (`German_credit.te`
 
 As the tree is quite big and we want to know if we can prune it. To do so, we decided to use the `printcp` and `plotcp` commands and choose the best **cp** (complexity parameter) value to prune our tree. 
 
-#### Pruning the tree 
+##### Pruning the tree 
 
 ```{r echo = FALSE}
 printcp(german.ct)
@@ -150,9 +150,9 @@ rpart.plot(german.ct.prune)
 
 This pruned decision tree with a cp of 0.022 uses the variables **CHK_ACCT** and **HISTORY**. 
 
-Using this pruned tree, we can compute the prediction and build a confusion matrix.
+Using this pruned tree, we can computed the prediction and build a confusion matrix to see the performance of the model.
 
-```{r}
+```{r echo = FALSE}
 german.ct.prediction <- predict(german.ct.prune, newdata=German_credit.te, type="class")
 
 # Confusion Matrix
@@ -163,10 +163,11 @@ cm_ctprune$table
 cm_ctprune$byClass
 ```
 
-The accuracy of the classification tree model is not really good (0.564), however we see that the balanced accuracy (0.6345) is a little bit better but still not enough.
 
-We decide to also look at what would an automatically pruned using 1-SE rule would give use and compare the model. 
-```{r}
+
+We also decided to look at what would an automatically pruned using 1-SE rule would give us and whether or not it is better than the pruned tree we made by looking at the cp.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 set.seed(1234)
 german.ct.autoprune <- autoprune(RESPONSE ~ ., method = "class",
                                  data = German_Credit.tr.subs)
@@ -174,23 +175,26 @@ rpart.plot(german.ct.autoprune )
 ```
 
 
-Here, only the variable **CHK_ACCT** is used. 
+Here, only the variable **CHK_ACCT** is used. As we prune the tree more information are lost. 
 
 
-```{r}
+```{r echo = FALSE}
 german.ct.autoprune.prediction <- predict(german.ct.autoprune,
                                           newdata=German_credit.te,
                                           type="class")
 
 # Confusion Matrix
-confusionMatrix(data=german.ct.autoprune.prediction,
-                reference = German_credit.te$RESPONSE)
+cm_ctautoprune <- confusionMatrix(data=german.ct.autoprune.prediction,
+                                  reference = German_credit.te$RESPONSE)
+
+cm_ctautoprune$table
+cm_ctautoprune$byClass
 ```
 
-The accuracy of the classification tree model is not really good (0.584) althought it is a little bit better than the one we fitted by hand. We also see that the balanced accuracy (0.6418) is a little bit better than its accuracy and the balanced accuracy of the other model, but still not enough.
 
 
-#### Variable importance of the classification tree 
+
+##### Variable importance of the classification tree 
 
 ```{r}
 varImp(german.ct.prune)
@@ -202,40 +206,48 @@ From this plot, we see that the variables that influences the most are **CHK_ACC
 The variable **CHK_ACCT** and **HISTORY** were noticed though. 
 
 
-### Fitting another model : Logistic Regression 
-```{r}
-# Logistic regression to see the significant variables (not working)
+#### 2. Logistic Regression  
+
+The next model we performed is a logistic regression. 
+```{r echo=FALSE}
+
 logreg <- glm(RESPONSE~., data = German_Credit.tr.subs, family= binomial)
 summary(logreg)
 ```
 
 We see that a lot of variables are not statistically significant for the model so we can think of a model reduction.
 
-We can predict using the logistic regression. 
+Before doing a reduction of the model, we fitted the model and predicted on the test set. 
 
-```{r}
-german.logrer.pred_prob <- predict(logreg, newdata = German_credit.te,
+```{r echo=FALSE}
+german.logreg.pred_prob <- predict(logreg, newdata = German_credit.te,
                                     type="response")
 
-german.logrer.pred <- ifelse(german.logrer.pred_prob >= 0.5, 1, 0)
+german.logreg.pred <- ifelse(german.logreg.pred_prob >= 0.5, 1, 0)
 
 # Confusion Matrix
-confusionMatrix(data=as.factor(german.logrer.pred),
-                reference = German_credit.te$RESPONSE)
+cm_logreg <- confusionMatrix(data=as.factor(german.logreg.pred),
+                             reference = German_credit.te$RESPONSE)
+
+cm_logreg$table
+cm_logreg$byClass
 ```
 
-From the confusion matrix summary, this model is better than the classification tree as the accuracy is higher (0.704) and that the balanced accuracy seems to be almost good as well ( 0.6852)
 
 
-#### Variable selection and interpretation with step method (AIC criteria)
+##### Variable selection and interpretation with step method (AIC criteria)
 
-The stepwise variable selection is performed. 
+In order to reduce the logistic regression we used a stepwise variable selection. This has been done with the command `step`. 
+
+```{r include = FALSE}
+mod.logreg.sel <- step(logreg) # store the final model into mod.logreg.sel
+```
+
+The final reduced model is as follow. 
 
 ```{r}
-mod.logreg.sel <- step(logreg) # store the final model into mod.logreg.sel
 summary(mod.logreg.sel)
 ```
-
 
 The variables that have been removed are : **FURNITURE**, **RADIO.TV**, **EDUCATION**, **RETRAINING**, **MALE_DIV**, **MALE_SINGLE**, **MALE_MAR_or_WID**, **CO.APPLICANT**, **REAL_ESTATE**, **OWN_RES**, **NUM_CREDITS**, **JOB** and **NUM_DEPENDENTS**
 
@@ -278,19 +290,22 @@ It means that :
 + The predicted probability of being a good applicant for **FOREIGN1** is higher than for **FOREIGN0**.
 
 
-```{r}
+```{r echo = FALSE}
 german.logregsel.pred_prob <- predict(mod.logreg.sel, newdata = German_credit.te,
                                     type="response")
 
 german.logregsel.pred <- ifelse(german.logregsel.pred_prob  >= 0.5, 1, 0)
 
 # Confusion Matrix
-confusionMatrix(data=as.factor(german.logregsel.pred),
-                reference = German_credit.te$RESPONSE)
+cm_logregsel <- confusionMatrix(data=as.factor(german.logregsel.pred),
+                                reference = German_credit.te$RESPONSE)
+
+cm_logregsel$table
+cm_logregsel$byClass
 ```
 
 
-#### Variable importance for logistic regression
+##### Variable importance for logistic regression
 
 ```{r}
 x_train <- select(German_Credit.tr.subs, -RESPONSE)
@@ -299,7 +314,7 @@ y_train <- pull(German_Credit.tr.subs, RESPONSE)
 explainer_logreg <- explain(model = mod.logreg.sel, 
                                data = x_train, 
                                y = as.numeric(y_train), 
-                               label = "Logistic Regression")
+                               label = "AIC reduced Logistic Regression")
 
 
 importance_logreg  <- calculate_importance(explainer_logreg)
@@ -312,56 +327,42 @@ vip(mod.logreg.sel)
 
 Listed above are the most important variables for the logarithmic regression we reduced. 
 
-### Fitting another model : KNN
+#### 3. K-Nearest Neighbor
+
 To perform a k-nearest neighbor method, we do not need to balance the data so we will use the unbalanced training set.
-Now, we make the prediction using a 2-NN (with Euclidean distance).
 
-```{r}
-German_credit.num.response <- German_credit_cleaned %>% 
-  select('RESPONSE','DURATION', 'AMOUNT', 
-         'INSTALL_RATE', 'AGE', 'NUM_CREDITS','NUM_DEPENDENTS')
-```
-
-```{r}
-set.seed(123)
-## build the K-NN model with k = 2 
-German_credit.knn <- knn3(data=German_credit.num.response, RESPONSE~., k=2) 
-
-German_credit.knn.pred <- predict(German_credit.knn, 
-                                  newdata = German_credit.num.response,
-                                  type="class")
-```
-
-Now we can use the 2-NN to predict the test set using the training set. 
+We first try to model it using a 2-NN (with Euclidean distance).
 Note that the model is fitting on the training set and the predictions are computed on the test set.
 
-```{r}
+```{r echo=FALSE}
 set.seed(123)
 # applying Knn model with k = 2 on the training set
-German_credit.knn.tr <- knn3(data=German_credit.tr, RESPONSE~., k=2)  
+German_credit.knn2.tr <- knn3(data=German_credit.tr, RESPONSE~., k=2)  
 
-German_credit.knn.tr.pred <- predict(German_credit.knn.tr, 
+German_credit.knn2.tr.pred <- predict(German_credit.knn2.tr, 
                                      newdata = German_credit.te, type="class")
 ```
 
-To compare the predictions above and the true state of the applicant (the one in the test set), we can build a table. It is called a **confusion matrix** (again, this will be detailed later on).
+
+```{r echo=FALSE}
+# Confusion Matrix
+cm_knn2 <- confusionMatrix(data=German_credit.knn2.tr.pred,
+                           reference = German_credit.te$RESPONSE)
+
+cm_knn2$table
+cm_knn2$byClass
+```
+
 
 The table is read as follow : 
 
 + We predicted 21 Bad credits and there were indeed 21 observed Bad credits. But the prediction misjudges 45 good credits by predicting bad credits.
-+ We predicted 128 Good credits as it was in fact a Good credits but 56 where predicted as Good while it was in fact Bad. 
++ We predicted 128 Good credits as it was in fact a Good credits but 56 where predicted as Good while it was in fact Bad.
 
-```{r}
-# Confusion Matrix
-confusionMatrix(data=German_credit.knn.tr.pred,
-                reference = German_credit.te$RESPONSE)
-```
-
-The accuracy (0.596) and the unbalanced accuracy (0.5063) are both too low. 
 
 The prediction is not perfect. We need to try to improve the prediction by changing K at that point. Therefore, we use K=3.
 
-```{r}
+```{r echo=FALSE}
 set.seed(123)
 # applying Knn model with k = 3 on the training set
 German_credit.knn3.tr <- knn3(data=German_credit.tr, RESPONSE~., k=3)  
@@ -370,64 +371,48 @@ German_credit.knn3.tr.pred <- predict(German_credit.knn3.tr,
                                       newdata = German_credit.te, type="class")
 ```
 
+
+```{r echo=FALSE}
+# Confusion Matrix
+cm_knn3 <- confusionMatrix(data=German_credit.knn3.tr.pred,
+                           reference = German_credit.te$RESPONSE)
+cm_knn3$table
+cm_knn3$byClass
+```
+
 The table is read as follow : 
 
 + We predicted 14 Bad credits and they were indeed observed Bad credits. But the prediction misjudges 28 good credits by predicting bad credits.
-+ We predicted 145 Good credits as it was in fact a Good credits but 6 where predicted as Good while it was in fact Bad. 
++ We predicted 145 Good credits as it was in fact a Good credits but 6 where predicted as Good while it was in fact Bad.
 
+#### 4. Linear Support Vector Machine
 
-```{r}
-# Confusion Matrix
-confusionMatrix(data=German_credit.knn3.tr.pred,
-                reference = German_credit.te$RESPONSE)
-```
+The next model is the linear Support Vector Machine. 
 
-Both the accuracy (0.636) and the balanced data (0.5100) improved a little bit with k = 3 compared to k = 2. 
-The accuracies might still be a bit low.
-
-
-### Linear Support Vector Machine
-
-
-...
-
-```{r}
+```{r echo=FALSE}
 German_credit.svm <- svm(RESPONSE ~ ., data=German_Credit.tr.subs, kernel="linear")
 German_credit.svm
 German_credit.svm.pred <- predict(German_credit.svm, newdata = German_credit.te)
 ```
 
-```{r}
-confusionMatrix(data=German_credit.svm.pred, reference = German_credit.te$RESPONSE )
+```{r echo=FALSE}
+cm_linearsvm <- confusionMatrix(data=German_credit.svm.pred, 
+                                reference = German_credit.te$RESPONSE )
+
+cm_linearsvm$table
+cm_linearsvm$byClass
 ```
 
-The accuracy (0.692) and the balanced accuracy (0.6802) are lower than 0.75 which means that it might not be good enough. 
-
-
-### Radial basis Support Vector Machine
-We try now with a radial basis kernel (the default).
-
-```{r}
-German_credit.rb <- svm(RESPONSE ~ ., data=German_Credit.tr.subs, kernel="radial")
-German_credit.rb
-
-German_credit.pred <- predict(German_credit.rb, newdata = German_credit.te)
-confusionMatrix(data=German_credit.pred, reference = German_credit.te$RESPONSE )
-```
-The accuracy is better, 70%, compared to 69% with the linear method.
-
-
-
-### Tunning the hyperparameters of Linear SVM
+##### Tunning the hyperparameters of Linear SVM
 
 We want to select the good hyperparameters for our linear SVM.
 
-```{r}
+```{r echo=FALSE}
 German_Credit.trctrl <- trainControl(method = "cv", number=10)
 ```
 
 
-```{r}
+```{r echo=FALSE}
 set.seed(143)
 svm_Linear <- train(RESPONSE ~., data = German_Credit.tr.subs, method = "svmLinear",
                     trControl=German_Credit.trctrl)
@@ -437,9 +422,8 @@ svm_Linear
 We see that we have a good accuracy (0.72). 
 
 
-```{r cache = TRUE}
+```{r cache = TRUE, echo = FALSE}
 grid <- expand.grid(C = c(0.01, 0.1, 1, 10, 100, 1000))
-grid
 
 set.seed(143)
 svm_Linear_Grid <- train(RESPONSE ~., data = German_Credit.tr.subs,
@@ -449,11 +433,9 @@ svm_Linear_Grid <- train(RESPONSE ~., data = German_Credit.tr.subs,
 svm_Linear_Grid
 
 plot(svm_Linear_Grid)
-
-svm_Linear_Grid$bestTune
 ```
 
-```{r}
+```{r echo=FALSE}
 German_credit.lsvm.tuned <- svm(RESPONSE ~ .,data = German_Credit.tr.subs,
                               kernel = "linear", 
                               cost = svm_Linear_Grid$bestTune$C)
@@ -461,19 +443,40 @@ German_credit.lsvm.tuned <- svm(RESPONSE ~ .,data = German_Credit.tr.subs,
 German_credit.lsvm.tuned.pred <- predict(German_credit.lsvm.tuned, 
                                        newdata = German_credit.te)
 
-confusionMatrix(data=German_credit.lsvm.tuned.pred, 
-                reference = German_credit.te$RESPONSE)
+cm_linearsvm_tuned <- confusionMatrix(data=German_credit.lsvm.tuned.pred,
+                                      reference = German_credit.te$RESPONSE)
+
+cm_linearsvm_tuned$table
+cm_linearsvm_tuned$byClass
 ```
 
-### Tunning the hyperparameters of Radial basis SVM
+
+#### 5. Radial Basis Support Vector Machine
+We try now with a radial basis kernel (the default).
 
 ```{r}
-grid_radial <- expand.grid(sigma = c(0.01, 0.02, 0.05, 0.1),
-                           C = c(1, 10, 100, 500, 1000))
-grid_radial
+German_credit.rbsvm <- svm(RESPONSE ~ ., data=German_Credit.tr.subs, kernel="radial")
+German_credit.rbsvm
+
+German_credit.rbsvm.pred <- predict(German_credit.rbsvm, 
+                                    newdata = German_credit.te)
+
+cm_rbsvm <- confusionMatrix(data=German_credit.rbsvm.pred, 
+                            reference = German_credit.te$RESPONSE )
+
+cm_rbsvm$table
+cm_rbsvm$byClass
 ```
 
-```{r cache = TRUE}
+
+##### Tunning the hyperparameters of Radial basis SVM
+
+```{r cache=TRUE, echo=FALSE}
+grid_radial <- expand.grid(sigma = c(0.01, 0.02, 0.05, 0.1),
+                           C = c(1, 10, 100, 500, 1000))
+```
+
+```{r cache = TRUE, echo=FALSE}
 set.seed(143)
 
 svm_Radial_Grid <- train(RESPONSE ~., data = German_Credit.tr.subs, 
@@ -485,7 +488,7 @@ svm_Radial_Grid
 ```
 
 
-```{r}
+```{r echo=FALSE}
 plot(svm_Radial_Grid)
 
 svm_Radial_Grid$bestTune
@@ -493,26 +496,27 @@ svm_Radial_Grid$bestTune
 
 
 ```{r}
-German_credit.rb.tuned <- svm(RESPONSE ~ .,data = German_Credit.tr.subs,
-                              kernel = "radial", 
-                              gamma = svm_Radial_Grid$bestTune$sigma,
-                              cost = svm_Radial_Grid$bestTune$C)
+German_credit.rbsvm.tuned <- svm(RESPONSE ~ .,data = German_Credit.tr.subs,
+                                 kernel = "radial", 
+                                 gamma = svm_Radial_Grid$bestTune$sigma,
+                                 cost = svm_Radial_Grid$bestTune$C)
 
-German_credit.rb.tuned.pred <- predict(German_credit.rb.tuned, 
-                                       newdata = German_credit.te)
+German_credit.rbsvm.tuned.pred <- predict(German_credit.rbsvm.tuned,
+                                          newdata = German_credit.te)
 
-confusionMatrix(data=German_credit.rb.tuned.pred, 
-                reference = German_credit.te$RESPONSE)
+cm_rbsvm_tuned <- confusionMatrix(data=German_credit.rbsvm.tuned.pred,
+                                  reference = German_credit.te$RESPONSE)
+
+cm_rbsvm_tuned$table
+cm_rbsvm_tuned$byClass
 ```
 
-We have an accuracy of 0.696 and a balanced accuracy of 0.6975. 
 
-
-
-### Neural network - Simple hyperparameter tuning
+#### 6. Neural Network - Simple hyperparameter tuning
 
 To select the good parameters, we build a search grid and fit the model with each possible value in the grid. This is brute force and time consuming. The best model is selected among all the possible choices.
-```{r cache = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
+
+```{r cache = TRUE, message = FALSE, warning = FALSE, results = 'hide', echo=FALSE}
 set.seed(1)
 fitControl <- trainControl(method = "cv", 
                            number = 10)
@@ -529,28 +533,33 @@ nnetFit <- train(RESPONSE ~ .,
 
 ```
 
-```{r}
+```{r echo=FALSE}
 plot(nnetFit)
 ```
 The best Neural Networks parameters would be to choose 3 hidden layers, with a decay of 0.4. 
 
-```{r}
+```{r include=FALSE}
 set.seed(345)
-nn4 <- nnet(RESPONSE ~ ., data=German_Credit.tr.subs, size=3, decay = 0.4)
+nn3 <- nnet(RESPONSE ~ ., data=German_Credit.tr.subs, size=3, decay = 0.4)
 
-nn4_pred <- predict(nn4, newdata = German_credit.te, type="class")
-
-confusionMatrix(data= as.factor(nn4_pred), 
-                reference = German_credit.te$RESPONSE)
-
+nn3_pred <- predict(nn3, newdata = German_credit.te, type="class")
 ```
-The accuracy of the neural network is of 81.61% 
 
 
-### Gradient Boosting  
+```{r echo=FALSE}
+cm_nn3 <- confusionMatrix(data= as.factor(nn3_pred),
+                          reference = German_credit.te$RESPONSE)
+
+cm_nn3$table
+cm_nn3$byClass
+```
+
+
+#### 7. Gradient Boosting 
+
 The Gradient Boosting model accepts only numerical values so we have some transformation to do on our data in order to use it. 
 
-```{r}
+```{r echo = FALSE}
 Gradient_boost.y_train <- as.integer(German_Credit.tr.subs$RESPONSE)-1
 Gradient_boost.y_test <- as.integer(German_credit.te$RESPONSE)-1
 
@@ -562,7 +571,7 @@ Gradient_boost.X_test <- sparse.model.matrix(RESPONSE ~ .-1,
 ```
 
 
-```{r}
+```{r echo = FALSE}
 set.seed(123)
 xgb_train <- xgb.DMatrix(data = Gradient_boost.X_train,
                          label = Gradient_boost.y_train)
@@ -593,37 +602,27 @@ xgb_model
 ```
 
 
-```{r}
+```{r echo=FALSE}
 xgb_preds <- predict(xgb_model, Gradient_boost.X_test, reshape = TRUE)
 ```
 
 Here we have an accuracy of 68.4%. It is good but there is room for improvement. 
 
-```{r}
-confusionMatrix(data=as.factor(xgb_preds), 
-                reference = as.factor(Gradient_boost.y_test))
+```{r echo=FALSE}
+cm_xgb <- confusionMatrix(data=as.factor(xgb_preds),
+                          reference = as.factor(Gradient_boost.y_test))
+
+cm_xgb$table
+cm_xgb$byClass
 ```
 
 
-
-
-## Next Analysis 
-
-- Balance the data using either method. 
-- Then, using **caret** and either CV or Bootstrap, put several models in competition. 
-- Select the best one according to the choice of score. 
-- Finally, use the test set to see if the best model does not overfit the training set.
-
-By doing this, we will have achieved a complete supervised learning task from A to Z.
-
-
-
-### Cross-validation with caret
+#### Cross-validation with caret
 The 10-CV can be easily obtained from **caret**. 
 
 First, set up the splitting data method using the **trainControl** function.
 
-```{r}
+```{r echo=FALSE}
 set.seed(123)
 German_Credit.trctrl <- trainControl(method = "cv", number=10)
 German.Credit.cv <- train(RESPONSE ~., data = German_credit.tr,
@@ -634,14 +633,14 @@ German.Credit.cv
 ```
 
 
-```{r}
+```{r echo=FALSE}
 German_Credit.cv.pred <- predict(German.Credit.cv, newdata = German_credit.te)
 
 confusionMatrix(data=German_Credit.cv.pred, reference = German_credit.te$RESPONSE)
 ```
 
 
-## Bootstrap with 10 replicates
+#### Bootstrap with 10 replicates
 We now apply the bootstrap with 10 replicates. Like for CV, we use **caret**.
 
 The approach is the same as before. 
@@ -649,7 +648,7 @@ We only need to change the method in the **trainControl** function. The correspo
 
 100 replicates is veryyyy long to run... can do that on less sample ?? I put 10, takes 3 minutes for me
 
-```{r cache = TRUE}
+```{r cache = TRUE, echo=FALSE}
 set.seed(123)
 trctrl <- trainControl(method = "boot632", number=10)
 German_credit.boot <- train(RESPONSE ~., data = German_credit.tr,
@@ -660,7 +659,7 @@ German_credit.boot
 ```
 
 
-```{r}
+```{r echo=FALSE}
 German_Credit.boot.pred <- predict(German_credit.boot, newdata = German_credit.te)
 
 confusionMatrix(data=German_Credit.boot.pred, reference = German_credit.te$RESPONSE)
@@ -668,4 +667,64 @@ confusionMatrix(data=German_Credit.boot.pred, reference = German_credit.te$RESPO
 
 
 ## Review of statistics
+
+Once all the models were modelized we have to compare them according to their scores and metrics. Below we summarized all their accuracy into one table. 
+
+
+```{r echo=FALSE}
+models_stat <- cbind(cm_bigct$overall,
+                     cm_ctprune$overall,
+                     cm_ctautoprune$overall,
+                     cm_logreg$overall,
+                     cm_logregsel$overall,
+                     # cm_knn2$overall,
+                     # cm_knn3$overall,
+                     cm_linearsvm$overall,
+                     cm_linearsvm_tuned$overall,
+                     cm_rbsvm$overall,
+                     cm_rbsvm_tuned$overall,
+                     cm_nn3$overall,
+                     cm_xgb$overall
+                     )
+
+colnames(models_stat) <- c("Big classification tree", 
+                          "Pruned classification tree", 
+                          "Autoprune classification tree", 
+                          "Logistic regression", 
+                          "AIC reduced Logistic regression",
+                          # "2-Nearest neighbor",
+                          # "3-Nearest neighbor", 
+                          "Linear support vector machine",
+                          "Tuned linear support vector machine",
+                          "Radial base support vector machine",
+                          "Tuned radial base support vector machine",
+                          "Hyperparameter tuned neural network 3 nodes",
+                          "Gradient Boosting"
+                          )
+
+kable(models_stat, digits = 4, caption = "Scores of the models") %>% 
+  kable_styling(latex_options="scale_down")
+```
+
+
+
+Another table is done to compare the KNN because they were not performed on the balanced dataset.  
+
+```{r  echo=FALSE}
+
+KNNmodels_stat <- cbind(cm_knn2$overall,
+                        cm_knn3$overall
+                        )
+
+colnames(KNNmodels_stat) <- c("2-Nearest neighbor",
+                             "3-Nearest neighbor"
+                             )
+
+kable(KNNmodels_stat, digits = 4, caption = "Scores of the KNN models")
+```
+
+
+
+
+
 

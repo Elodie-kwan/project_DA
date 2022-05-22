@@ -9,7 +9,8 @@ packages <- c(
 "dplyr",  "ggplot2", "factoextra", "rpart.plot",
 "FactoMineR", "adabag", "caret","e1071", 
 "DALEX", "vip", "nnet",
-"xgboost", "caTools", "Matrix", 'FactoMineR'
+"xgboost", "caTools", "Matrix",
+"knitr", "kableExtra"
 )
 
 purrr::walk(packages, library, character.only = TRUE)

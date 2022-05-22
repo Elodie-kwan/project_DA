@@ -19,6 +19,7 @@ gridExtra
 summarytools
 factoextra
 rpart.plot
+FactoMineR
 caret
 foreach
 iterators
@@ -27,9 +28,9 @@ adabag
 e1071
 DALEX
 vip
+nnet
 xgboost
 caTools
 Matrix
-nnet
-FactoMineR
 knitr
+kableExtra

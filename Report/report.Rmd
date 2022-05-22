@@ -1,6 +1,8 @@
 ---
 title: "Report"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 date: '2022-05-20'
 ---
 
