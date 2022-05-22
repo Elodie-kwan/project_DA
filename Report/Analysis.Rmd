@@ -11,6 +11,8 @@ output:
 source("../scripts/setup.R")
 ```
 
+## Methodology
+
 ### Import libraries and data
 
 ```{r}
@@ -648,5 +650,5 @@ confusionMatrix(data=German_Credit.boot.pred, reference = German_credit.te$RESPO
 ```
 
 
-
+## Review of statistics
 

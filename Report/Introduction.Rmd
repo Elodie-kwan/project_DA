@@ -5,23 +5,38 @@ date: '2022-04-26'
 output: pdf_document
 ---
 
-Homework 1: The German Credit data.
 
-Description: The German credit databset contains 1000 of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** or **Bad Credit**: Therefore, the response variable, studied, is the credit rating. 
+## Executive Summary
 
-Response variable: **RESPONSE** in the dataset
-0 -> Bad credit 
-1 -> Good credit
+--------------
+TBD
+--------------
 
-All the other observations are features of the applicants that are going to be studied in order to better classify the new applicants. Our goal is to implement the best classifying model to determine the credit rating as accurate as possible. To do that, we will go through many machine learning models and deploy the CRISP-DM model to solve this problem.
 
-Report structure:
+## Introduction 
+In the bank industry many bankers have to decided whether or not they should issue a loan to a new coming applicant. In this report, we will use the data set called **German Credit data** which was given to us. 
 
-1/ Data Cleaning: Sorting the dataset to make it ready for the analysis
 
-2/ Exploratory Data Analysis; EDA: Studing the dataset and the variables, one by one, plus a PCA
+The German credit data set contains 1000 observations of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** or **Bad Credit**: Therefore, the response variable, studied, is the credit rating. 
 
-3/ Analysis: 
+
+Response variable: **RESPONSE** in the dataset:
+
++ 0 : Bad credit. In case of bad credit, the banker would not want to issue loan to this person. 
++ 1 : Good credit. In case of good credit, the banker will want to issue loan to this applicant as it is more likely that the company will benefit from it. 
+
+
+All the other observations are features of the applicants that are going to be studied. It will allow us to perform several machine learning models and deploy a CRISP-DM model to come up with the best classifying model with the highest accuracy as possible. We want to determine whether the new applicant is a 'Good' one, in which case the loan should be issued, or a 'Bad' one, in which case it is not advisable to give him a loan.
+
+
+The tasks required to perform our analysis is stated as follow. 
+
+1/ We first proceeded to some data cleaning, meaning that we sorted the dataset to make it ready for the analysis. 
+
+2/ Then we followed by an exploratory data analysis (EDA) where we studied the dataset and the different variables, one by one, and we made an principal component analysis. 
+
+3/ Next, came the models analysis, the steps are listed below: 
+
   a) Splitting the dataset
   b) Balancing the data
   c) Fitting the models
@@ -30,4 +45,3 @@ Report structure:
   f) Cross-validation / Bootstrap
   g) Final Best model 
   
-4/ Conclusion: is there a accurate model that can determine the credit rating of new applicants ? If Yes which one ? Is there some limitations in this model?
