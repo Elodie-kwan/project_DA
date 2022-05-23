@@ -617,55 +617,7 @@ cm_xgb$table
 cm_xgb$byClass
 ```
 
-
-#### Cross-validation with caret
-The 10-CV can be easily obtained from **caret**. 
-
-First, set up the splitting data method using the **trainControl** function.
-
-```{r echo=FALSE}
-set.seed(123)
-German_Credit.trctrl <- trainControl(method = "cv", number=10)
-German.Credit.cv <- train(RESPONSE ~., data = German_credit.tr,
-                method = "glmStepAIC", 
-                family="binomial",
-                trControl=German_Credit.trctrl, trace=0)
-German.Credit.cv
-```
-
-
-```{r echo=FALSE}
-German_Credit.cv.pred <- predict(German.Credit.cv, newdata = German_credit.te)
-
-confusionMatrix(data=German_Credit.cv.pred, reference = German_credit.te$RESPONSE)
-```
-
-
-#### Bootstrap with 10 replicates
-We now apply the bootstrap with 10 replicates. Like for CV, we use **caret**.
-
-The approach is the same as before. 
-We only need to change the method in the **trainControl** function. The corresponding method is “boot632”.
-
-100 replicates is veryyyy long to run... can do that on less sample ?? I put 10, takes 3 minutes for me
-
-```{r cache = TRUE, echo=FALSE}
-set.seed(123)
-trctrl <- trainControl(method = "boot632", number=10)
-German_credit.boot <- train(RESPONSE ~., data = German_credit.tr,
-                            method = "glmStepAIC", family="binomial",
-                            trControl=trctrl, trace = 0)
-
-German_credit.boot
-```
-
-
-```{r echo=FALSE}
-German_Credit.boot.pred <- predict(German_credit.boot, newdata = German_credit.te)
-
-confusionMatrix(data=German_Credit.boot.pred, reference = German_credit.te$RESPONSE)
-```
-
+------------------------------------------
 
 ## Review of statistics
 
