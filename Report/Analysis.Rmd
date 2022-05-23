@@ -325,7 +325,7 @@ plot(importance_logreg)
 vip(mod.logreg.sel)
 ```
 
-Listed above are the most important variables for the logarithmic regression we reduced. 
+Listed above are the most important variables for the logarithmic regression we reduced. Here again, the CHK_ACCT variable differentiate itself from the others in term of importance in the model prediction. 
 
 #### 3. K-Nearest Neighbor
 
@@ -362,6 +362,7 @@ The table is read as follow :
 
 The prediction is not perfect. We need to try to improve the prediction by changing K at that point. Therefore, we use K=3.
 
+#### 3.b K-Nearest Neighbor (K=3)
 ```{r echo=FALSE}
 set.seed(123)
 # applying Knn model with k = 3 on the training set
