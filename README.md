@@ -1,4 +1,4 @@
-Machine Learning project for the "Machine Learning" course given by Prof. O. Boldi during the Spring Semester 2022.
+Data analytics for decision making project for the "Projects in Data Analytics for Decision Making" course given by Dr. Jacques Zuber during the Spring Semester 2022.
 
 ## Group members  
 * Elodie Kwan 
