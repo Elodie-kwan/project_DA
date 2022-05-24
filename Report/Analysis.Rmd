@@ -3,8 +3,8 @@ title: "Analysis"
 author: "Elodie Kwan and Katia Voltz"
 date: '2022-04-26'
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -105,7 +105,7 @@ summary(german.ct)
 
 We obtained the following large tree. 
 
-```{r echo = FALSE}
+```{r echo = FALSE, fig.align = 'center'}
 rpart.plot(german.ct)
 ```
 
@@ -134,7 +134,7 @@ As the tree is quite big and we want to know if we can prune it. To do so, we de
 
 ##### Pruning the tree 
 
-```{r echo = FALSE}
+```{r echo = FALSE, fig.align = 'center'}
 printcp(german.ct)
 
 plotcp(german.ct)
@@ -148,7 +148,7 @@ The value of cp can be chosen arbitrarily between 0.018 and 0.095. So we decided
 
 With these value, we obtain a very small tree. 
 
-```{r echo = FALSE}
+```{r echo = FALSE, fig.align = 'center'}
 german.ct.prune <- prune(german.ct, cp=0.022)
 rpart.plot(german.ct.prune)
 ```
@@ -164,7 +164,11 @@ german.ct.prediction <- predict(german.ct.prune, newdata=German_credit.te, type=
 cm_ctprune <- confusionMatrix(data=german.ct.prediction, 
                               reference = German_credit.te$RESPONSE)
 
-cm_ctprune$table
+pander(cm_ctprune$table, 
+       caption = "Confusion Matrix of the Pruned classification tree",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_ctprune$byClass
 ```
 
@@ -172,7 +176,7 @@ cm_ctprune$byClass
 
 We also decided to look at what would an automatically pruned using 1-SE rule would give us and whether or not it is better than the pruned tree we made by looking at the cp.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 set.seed(1234)
 german.ct.autoprune <- autoprune(RESPONSE ~ ., method = "class",
                                  data = German_Credit.tr.subs)
@@ -192,7 +196,11 @@ german.ct.autoprune.prediction <- predict(german.ct.autoprune,
 cm_ctautoprune <- confusionMatrix(data=german.ct.autoprune.prediction,
                                   reference = German_credit.te$RESPONSE)
 
-cm_ctautoprune$table
+pander(cm_ctautoprune$table, 
+       caption = "Confusion Matrix of the Autoruned classification tree",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_ctautoprune$byClass
 ```
 
@@ -201,7 +209,7 @@ cm_ctautoprune$byClass
 
 ##### Variable importance of the classification tree 
 
-```{r}
+```{r fig.align='center', echo=FALSE}
 varImp(german.ct.prune)
 vip(german.ct.prune)
 ```
@@ -234,7 +242,11 @@ german.logreg.pred <- ifelse(german.logreg.pred_prob >= 0.5, 1, 0)
 cm_logreg <- confusionMatrix(data=as.factor(german.logreg.pred),
                              reference = German_credit.te$RESPONSE)
 
-cm_logreg$table
+pander(cm_logreg$table, 
+       caption = "Confusion Matrix of the Logistic Regression",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_logreg$byClass
 ```
 
@@ -250,7 +262,7 @@ mod.logreg.sel <- step(logreg) # store the final model into mod.logreg.sel
 
 The final reduced model is as follow. 
 
-```{r}
+```{r echo=FALSE}
 summary(mod.logreg.sel)
 ```
 
@@ -305,14 +317,18 @@ german.logregsel.pred <- ifelse(german.logregsel.pred_prob  >= 0.5, 1, 0)
 cm_logregsel <- confusionMatrix(data=as.factor(german.logregsel.pred),
                                 reference = German_credit.te$RESPONSE)
 
-cm_logregsel$table
+pander(cm_logregsel$table, 
+       caption = "Confusion Matrix of the AIC reduced Logistic regression",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_logregsel$byClass
 ```
 
 
 ##### Variable importance for logistic regression
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 x_train <- select(German_Credit.tr.subs, -RESPONSE)
 y_train <- pull(German_Credit.tr.subs, RESPONSE)
 
@@ -326,13 +342,13 @@ importance_logreg  <- calculate_importance(explainer_logreg)
 plot(importance_logreg)
 ```
 
-```{r}
+```{r echo=FALSE}
 vip(mod.logreg.sel)
 ```
 
 Listed above are the most important variables for the logarithmic regression we reduced. Here again, the CHK_ACCT variable differentiate itself from the others in term of importance in the model prediction. 
 
-#### 3. K-Nearest Neighbor
+#### 3.a K-Nearest Neighbor (K=2)
 
 To perform a k-nearest neighbor method, we do not need to balance the data so we will use the unbalanced training set.
 
@@ -354,7 +370,11 @@ German_credit.knn2.tr.pred <- predict(German_credit.knn2.tr,
 cm_knn2 <- confusionMatrix(data=German_credit.knn2.tr.pred,
                            reference = German_credit.te$RESPONSE)
 
-cm_knn2$table
+pander(cm_knn2$table, 
+       caption = "Confusion Matrix of the 2-Nearest neighbor",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_knn2$byClass
 ```
 
@@ -382,7 +402,12 @@ German_credit.knn3.tr.pred <- predict(German_credit.knn3.tr,
 # Confusion Matrix
 cm_knn3 <- confusionMatrix(data=German_credit.knn3.tr.pred,
                            reference = German_credit.te$RESPONSE)
-cm_knn3$table
+
+pander(cm_bigct$table, 
+       caption = "Confusion Matrix of the 3-Nearest neighbor",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_knn3$byClass
 ```
 
@@ -405,7 +430,11 @@ German_credit.svm.pred <- predict(German_credit.svm, newdata = German_credit.te)
 cm_linearsvm <- confusionMatrix(data=German_credit.svm.pred, 
                                 reference = German_credit.te$RESPONSE )
 
-cm_linearsvm$table
+pander(cm_linearsvm$table, 
+       caption = "Confusion Matrix of the Linear support vector machine",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_linearsvm$byClass
 ```
 
@@ -428,7 +457,7 @@ svm_Linear
 We see that we have a good accuracy (0.72). 
 
 
-```{r cache = TRUE, echo = FALSE}
+```{r cache = TRUE, echo = FALSE, fig.align='center'}
 grid <- expand.grid(C = c(0.01, 0.1, 1, 10, 100, 1000))
 
 set.seed(143)
@@ -452,7 +481,11 @@ German_credit.lsvm.tuned.pred <- predict(German_credit.lsvm.tuned,
 cm_linearsvm_tuned <- confusionMatrix(data=German_credit.lsvm.tuned.pred,
                                       reference = German_credit.te$RESPONSE)
 
-cm_linearsvm_tuned$table
+pander(cm_linearsvm_tuned$table, 
+       caption = "Confusion Matrix of the Tuned linear support vector machine",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_linearsvm_tuned$byClass
 ```
 
@@ -460,7 +493,7 @@ cm_linearsvm_tuned$byClass
 #### 5. Radial Basis Support Vector Machine
 We try now with a radial basis kernel (the default).
 
-```{r}
+```{r echo=FALSE}
 German_credit.rbsvm <- svm(RESPONSE ~ ., data=German_Credit.tr.subs, kernel="radial")
 German_credit.rbsvm
 
@@ -470,7 +503,11 @@ German_credit.rbsvm.pred <- predict(German_credit.rbsvm,
 cm_rbsvm <- confusionMatrix(data=German_credit.rbsvm.pred, 
                             reference = German_credit.te$RESPONSE )
 
-cm_rbsvm$table
+pander(cm_rbsvm$table, 
+       caption = "Confusion Matrix of the Radial base support vector machine",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_rbsvm$byClass
 ```
 
@@ -494,14 +531,14 @@ svm_Radial_Grid
 ```
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.align='center'}
 plot(svm_Radial_Grid)
 
 svm_Radial_Grid$bestTune
 ```
 
 
-```{r}
+```{r echo=FALSE}
 German_credit.rbsvm.tuned <- svm(RESPONSE ~ .,data = German_Credit.tr.subs,
                                  kernel = "radial", 
                                  gamma = svm_Radial_Grid$bestTune$sigma,
@@ -513,7 +550,11 @@ German_credit.rbsvm.tuned.pred <- predict(German_credit.rbsvm.tuned,
 cm_rbsvm_tuned <- confusionMatrix(data=German_credit.rbsvm.tuned.pred,
                                   reference = German_credit.te$RESPONSE)
 
-cm_rbsvm_tuned$table
+pander(cm_rbsvm_tuned$table, 
+       caption = "Confusion Matrix of the Tuned radial base support vector machine",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_rbsvm_tuned$byClass
 ```
 
@@ -539,7 +580,7 @@ nnetFit <- train(RESPONSE ~ .,
 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.align='center'}
 plot(nnetFit)
 ```
 The best Neural Networks parameters would be to choose 3 hidden layers, with a decay of 0.4. 
@@ -556,7 +597,11 @@ nn3_pred <- predict(nn3, newdata = German_credit.te, type="class")
 cm_nn3 <- confusionMatrix(data= as.factor(nn3_pred),
                           reference = German_credit.te$RESPONSE)
 
-cm_nn3$table
+pander(cm_nn3$table, 
+       caption = "Confusion Matrix of the Hyperparameter tuned neural network 3 nodes",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_nn3$byClass
 ```
 
@@ -618,7 +663,10 @@ Here we have an accuracy of 68.4%. It is good but there is room for improvement.
 cm_xgb <- confusionMatrix(data=as.factor(xgb_preds),
                           reference = as.factor(Gradient_boost.y_test))
 
-cm_xgb$table
+pander(cm_xgb$table, 
+       caption = "Confusion Matrix of the Gadient boosting",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
 cm_xgb$byClass
 ```
 
