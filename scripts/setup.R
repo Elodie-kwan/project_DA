@@ -10,7 +10,7 @@ packages <- c(
 "FactoMineR", "adabag", "caret","e1071", 
 "DALEX", "vip", "nnet",
 "xgboost", "caTools", "Matrix",
-"knitr", "kableExtra"
+"knitr", "kableExtra", "pander"
 )
 
 purrr::walk(packages, library, character.only = TRUE)
