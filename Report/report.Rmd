@@ -1,5 +1,6 @@
 ---
-title: "Report"
+title: "Report on the German credit dataset"
+author: "Elodie Kwan and Katia Voltz"
 output:
   pdf_document: default
   html_document: default

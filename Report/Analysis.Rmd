@@ -118,8 +118,13 @@ german.bigct.prediction <- predict(german.ct,
 cm_bigct <- confusionMatrix(data=german.bigct.prediction ,
                             reference = German_credit.te$RESPONSE)
 
-cm_bigct$table
+pander(cm_bigct$table, 
+       caption = "Confusion Matrix of the Big classification tree",
+       row.names = c("Bad credit risk", "Good credit risk"),
+       col.names = c("Bad credit risk", "Good credit risk"))
+
 cm_bigct$byClass
+
 ```
 
 We first have an insight on how well it predict the test set (`German_credit.te`
@@ -621,7 +626,7 @@ cm_xgb$byClass
 
 ## Review of statistics
 
-Once all the models were modelized we have to compare them according to their scores and metrics. Below we summarized all their accuracy into one table. 
+Once all the models were modelized we compared them according to their scores and metrics. Below we summarized all their accuracy into one table. 
 
 
 ```{r echo=FALSE}
@@ -655,15 +660,25 @@ colnames(models_stat) <- c("Big classification tree",
                           "Gradient Boosting"
                           )
 
-kable(models_stat, digits = 4, caption = "Scores of the models") %>% 
-  kable_styling(latex_options="scale_down")
+rownames(models_stat) <- c("Accuracy", "Kappa", "Accuracy lower bound", 
+                           "Accuracy upper bound", "Accuracy null", 
+                           "Accuracy P-value", "Mcnemar P-value")
+
+pander(models_stat, digits = 4, split.table = 190,
+       caption = "Scores of the models") 
+
+
 ```
 
+According to these two first tables, the best model would be the "Radial base linear support vector machine" as it has the highest accuracy level of 0.7 and the best kappa value of 0.3628. 
+
+The accuracy means that out of total number of observations, the model predicted correctly 70% of them. The Cohen’s Kappa Coefficient means that there is 36% of agreement, indicating that the raters agree in their classification for 36% of the cases. 
 
 
-Another table is done to compare the KNN because they were not performed on the balanced dataset.  
+Another table is done to compare the KNN because they were not performed on the balanced dataset. 
 
-```{r  echo=FALSE}
+
+```{r echo=FALSE}
 
 KNNmodels_stat <- cbind(cm_knn2$overall,
                         cm_knn3$overall
@@ -673,11 +688,11 @@ colnames(KNNmodels_stat) <- c("2-Nearest neighbor",
                              "3-Nearest neighbor"
                              )
 
-kable(KNNmodels_stat, digits = 4, caption = "Scores of the KNN models")
+pander(KNNmodels_stat, digits = 4, caption = "Scores of the KNN models")
 ```
 
 
-
+Overall, we see that the worst model is the 'Autoprune classification tree'. This is understandable because we pruned the model so much that we lost many observations on the way. 
 
 
 
