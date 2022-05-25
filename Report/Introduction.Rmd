@@ -12,7 +12,7 @@ Data analysis is now a fundamental tool in the general understanding of business
 
 
 ## Introduction 
-In the bank industry many bankers have to decided whether or not they should issue a loan to a new coming applicant. In this report, we will use the data set called **German Credit data** which was given to us. 
+In the bank industry many bankers have to decid whether or not they should issue a loan to a new coming applicant. In this report, we will use the data set called **German Credit data** which was given to us. 
 
 
 The German credit data set contains 1000 observations of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** risk or **Bad Credit** risk: Therefore, the response variable, studied, is the credit rating. 

@@ -128,7 +128,8 @@ cm_bigct$byClass
 ```
 
 We first have an insight on how well it predict the test set (`German_credit.te`
-). We recall that 0 means a "Bad Credit" risk and 1 means a "Good Credit" risk. It seems that it has difficulty to predict the "Bad Credit" risk applicants. 
+). We recall that 0 means a "Bad Credit" risk and 1 means a "Good Credit" risk. It seems that this model has difficulty to predict the "Bad Credit" risk applicants. Indeed from the table have 70 observations that were misclassified as being "Bad credit" while it was in fact a "Good credit". 
+
 
 As the tree is quite big and we want to know if we can prune it. To do so, we decided to use the `printcp` and `plotcp` commands and choose the best **cp** (complexity parameter) value to prune our tree. 
 
@@ -172,6 +173,7 @@ pander(cm_ctprune$table,
 cm_ctprune$byClass
 ```
 
+Here again, this model has difficulty to predict the "Bad credit" cases. The model also decreased in its precision values.
 
 
 We also decided to look at what would an automatically pruned using 1-SE rule would give us and whether or not it is better than the pruned tree we made by looking at the cp.
@@ -204,19 +206,27 @@ pander(cm_ctautoprune$table,
 cm_ctautoprune$byClass
 ```
 
-
-
+Again, it seems that in general the classification trees we perfomed have difficulty to predict the "Bad credit" cases. 
 
 ##### Variable importance of the classification tree 
 
-```{r fig.align='center', echo=FALSE}
+Then we analysed the variable importance of one of the models. We decided to compute the variable importance of the **pruned classisication tree** `german.ct.prune` by applying the function `varImp` on the model. 
+
+```{r include=FALSE}
 varImp(german.ct.prune)
+```
+
+
+It is summarized below on the plot. 
+
+```{r fig.align='center', echo=FALSE}
 vip(german.ct.prune)
 ```
 
 From this plot, we see that the variables that influences the most are **CHK_ACCT**, **HISTORY**, **SAV_ACCT**, **DURATION**, **AMOUNT** and **REAL_ESTATE**. They are not exactly the same as the one we saw above.
 
-The variable **CHK_ACCT** and **HISTORY** were noticed though. 
+The variable **CHK_ACCT** and **HISTORY** were already noticed though. 
+
 
 
 #### 2. Logistic Regression  
@@ -250,7 +260,7 @@ pander(cm_logreg$table,
 cm_logreg$byClass
 ```
 
-
+From the confusion matrix, we see again the the model has difficulty to predict the "Bad credit" althought the wronged classified amount of observation is lower when it comes to the "Bad credit" one.
 
 ##### Variable selection and interpretation with step method (AIC criteria)
 
@@ -325,10 +335,11 @@ pander(cm_logregsel$table,
 cm_logregsel$byClass
 ```
 
+From this point we might think that the problem for the difficulty to predict the "Bad Credit" cases is not due to the models but rather the data itself. We might still want to perfom other models to make sure of our intuition.
 
 ##### Variable importance for logistic regression
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r include=FALSE}
 x_train <- select(German_Credit.tr.subs, -RESPONSE)
 y_train <- pull(German_Credit.tr.subs, RESPONSE)
 
@@ -339,14 +350,18 @@ explainer_logreg <- explain(model = mod.logreg.sel,
 
 
 importance_logreg  <- calculate_importance(explainer_logreg)
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 plot(importance_logreg)
 ```
+
 
 ```{r echo=FALSE}
 vip(mod.logreg.sel)
 ```
 
-Listed above are the most important variables for the logarithmic regression we reduced. Here again, the CHK_ACCT variable differentiate itself from the others in term of importance in the model prediction. 
+Listed above are the most important variables for the logarithmic regression we reduced. Here again, the **CHK_ACCT** variable differentiate itself from the others in term of importance in the model prediction. 
 
 #### 3.a K-Nearest Neighbor (K=2)
 
@@ -381,9 +396,10 @@ cm_knn2$byClass
 
 The table is read as follow : 
 
-+ We predicted 21 Bad credits and there were indeed 21 observed Bad credits. But the prediction misjudges 45 good credits by predicting bad credits.
++ We predicted 21 Bad credits and there were indeed 21 observed Bad credits. But the prediction misjudges 45 good credits by predicting them as bad credits.
 + We predicted 128 Good credits as it was in fact a Good credits but 56 where predicted as Good while it was in fact Bad.
 
+So again, this model also have difficulties to predict the "Bad Credit" cases.
 
 The prediction is not perfect. We need to try to improve the prediction by changing K at that point. Therefore, we use K=3.
 
@@ -413,8 +429,10 @@ cm_knn3$byClass
 
 The table is read as follow : 
 
-+ We predicted 14 Bad credits and they were indeed observed Bad credits. But the prediction misjudges 28 good credits by predicting bad credits.
-+ We predicted 145 Good credits as it was in fact a Good credits but 6 where predicted as Good while it was in fact Bad.
++ We predicted 58 Bad credits and they were indeed observed Bad credits. But the prediction misjudges 70 good credits by predicting them as being bad credits.
++ We predicted 103 Good credits as it was in fact a Good credits but 19 where predicted as Good while it was in fact Bad.
+
+Again it seems not to have improved anything, the **F-measure** even seems to have decreased a little bit.
 
 #### 4. Linear Support Vector Machine
 
@@ -437,6 +455,10 @@ pander(cm_linearsvm$table,
 
 cm_linearsvm$byClass
 ```
+
+This model seems to have improved a little bit our ability to predict the "Bad Credit" cases. As half of the "Bad Credit" predicted by the model are correct. 
+
+
 
 ##### Tunning the hyperparameters of Linear SVM
 
@@ -489,6 +511,10 @@ pander(cm_linearsvm_tuned$table,
 cm_linearsvm_tuned$byClass
 ```
 
+Again, half of the "Bad Credit" predicted observations are indeed "Bad credit". 
+
+The Linear support vector models are not too bad in the sense that they are better that the models we have seen so far.
+
 
 #### 5. Radial Basis Support Vector Machine
 We try now with a radial basis kernel (the default).
@@ -511,6 +537,7 @@ pander(cm_rbsvm$table,
 cm_rbsvm$byClass
 ```
 
+This model performance is very close to the linear support vector models. We need to infer more by looking at the tunned version.
 
 ##### Tunning the hyperparameters of Radial basis SVM
 
@@ -557,6 +584,8 @@ pander(cm_rbsvm_tuned$table,
 
 cm_rbsvm_tuned$byClass
 ```
+
+The model seems to be well balanced and it has good scores. The F-measure is quite high as well.
 
 
 #### 6. Neural Network - Simple hyperparameter tuning
@@ -605,6 +634,7 @@ pander(cm_nn3$table,
 cm_nn3$byClass
 ```
 
+We see that this Neural Network competes quite close to the support vector machines ones. Almost half of the "Bad credit" cases that it has predicted are correct. 
 
 #### 7. Gradient Boosting 
 
@@ -722,6 +752,7 @@ According to these two first tables, the best model would be the "Radial base li
 
 The accuracy means that out of total number of observations, the model predicted correctly 70% of them. The Cohen’s Kappa Coefficient means that there is 36% of agreement, indicating that the raters agree in their classification for 36% of the cases. 
 
+We also remember that the model was almost better than the other models when it came to predict the "Bad credit" cases. Although the model remains quite poor at predicting them since only half of the predicted ones are correct. 
 
 Another table is done to compare the KNN because they were not performed on the balanced dataset. 
 

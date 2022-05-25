@@ -34,3 +34,4 @@ caTools
 Matrix
 knitr
 kableExtra
+pander

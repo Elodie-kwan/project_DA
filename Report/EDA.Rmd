@@ -26,7 +26,7 @@ German_credit <- read.csv("./../Data_DA/GermanCredit.csv", header = TRUE, sep = 
 The title of the dataset is *German credit data* and the name of the file is **GermanCredit.cvs**. 
 
 
-As said in the introduction, the German Credit data has data on 1000 observations on past credit applicants and it is described by 30 attributes. Each applicant is rated as "Good" or "Bad" credit (encoded as 1 and 0 respectively in the **RESPONSE** variable). 
+As said in the introduction, the German Credit data has data on 1000 observations on past credit applicants and it is described by 30 attributes. Each applicant is rated as "Good" or "Bad" credit (encoded as 1 and 0 respectively in the **RESPONSE** variable). The definitions of all the attributes are stated in the annex under 'Appendix A'. 
 
 We looked at the attribute Information :
 
@@ -35,7 +35,8 @@ str(German_credit)
 ```
 
 ```{r echo=FALSE}
-pander(summary(German_credit), split.tables = 200)
+pander(summary(German_credit), split.tables = 150,
+       caption = "Summary of the German Credit dataset")
 ```
 
 We noticed that the variable **EDUCATION** has a minimum value of '-1' but it should be '0' since there are only 2 levels (0 and 1). Indeed, the observation 37 indicate a value of '-1' for **EDUCATION**. 
@@ -63,7 +64,7 @@ German_credit$AGE[537] <- 75
 ```
 
 
-After looking at the different attributes, we concluded that there were no missing values. 
+After looking at the different attributes, we concluded that there were no missing values.
  
 ```{r include = FALSE }
 which(is.na(German_credit))
@@ -77,7 +78,7 @@ It is a dummy variable with 0/1.
   2. 1 : Yes, the credit rating is good.
 
 
-We had to make sure that the class of the variables are correct. As described above, all the variables are defined as *integer* but we know that we should have numerical and categorical variables in our dataset. Therefore, we have to transform the class of some of them.
+We had to make sure that the class of the variables are correct. First when we imported the data, all the variables were defined as *integer* but we know that we should have numerical and categorical variables in our dataset. Therefore, we transformed the class of some of them.
 
 ```{r chunck_reuse4, echo = FALSE}
 ## ----
@@ -97,37 +98,39 @@ for (i in 1:ncol(German_credit)){
 ```
 
 
-```{r echo=FALSE}
+```{r include=FALSE}
 str(German_credit)
 ```
 
-The binomial data are set as factors and the others as numerical. 
+The binomial and categorical data are set as factors and the others as numerical. 
 
 
-We then described the variables one more time and we should get better results.  
+We then described the variables one more time with the function `describe` from the `Hmisc` package because we should get better results as our computer now recognizes the factor variables and the numerical ones. 
+
+```{r include=FALSE}
+Hmisc::describe(German_credit)
+```
 
 ```{r echo = FALSE, fig.align='center'}
-Hmisc::describe(German_credit)
-
 pander(introduce(German_credit))
 
 plot_intro(German_credit)
 ```
 
-The plot helps us to see the percentage of continuous variable, the percentage of discrete variables and whether or not some observations are missing. 
+The plot helps us to see the percentage of continuous variable, the percentage of discrete variables and whether or not some observations are missing. Here it states that we have 81% of discrete columns and 19% of continuous one. 
 
 
 ### Visualization of the data 
 First, we plot all the continuous variables into histograms and their corresponding density plots. 
 
-```{r echo = FALSE, fig.show="hold", out.width="50%", fig.align='center'}
+```{r echo = FALSE, fig.show="hold", fig.align='center'}
 plot_histogram(German_credit)
 plot_density(German_credit)
 ```
 
 Our first notice is that the data are not really normally distributed. Some of them are right-tailed.
 
-We can look at the tails and outliers more carefully through boxplots. 
+We can look at the tails and outliers more in deep through boxplots. 
 
 ```{r echo = FALSE, fig.align='center'}
 plot_boxplot(German_credit, by = 'RESPONSE',  ncol = 2,
@@ -136,7 +139,7 @@ plot_boxplot(German_credit, by = 'RESPONSE',  ncol = 2,
 
 This seems not to be disturbing. It makes sense that only a few people has a big credit amount. However it seems that the 'bad' clients tends to ask for bigger credit amount than 'good' clients. 
 
-Then, we made some barplots of the categorical variables (appendix A).
+Then, we made some barplots of the categorical variables (appendix B).
 
 ```{r chunk_annex_1, include=FALSE, fig.show="hold", out.width="50%"}
 for (i in 1:ncol(German_credit)){
@@ -158,9 +161,9 @@ From these barplots we saw:
 + Almost none of the applicants is a foreign worker. (FOREIGN) 
 + We have more information on people that are 'good' applicants and less information on 'bad' applicants. It would be better to have more information on 'bad' applicants as well in order to make good predictions with models. We will have to take this into account later. (RESPONSE)
 
-A general summary can be done. 
+To wrap up, we looked at a general summary of the data with the command `dfSummary` to make sure that the right class was applied to the columns, and to see their distribution and frequency (Appendix C). We concluded that our data were well structured.  
 
-```{r echo = FALSE}
+```{r chunk_annex_2, include = FALSE}
 dfSummary(German_credit, style = 'grid')
 ```
 
@@ -169,14 +172,14 @@ dfSummary(German_credit, style = 'grid')
 
 Correlation plot between continuous variables : 
 
-```{r echo = FALSE}
+```{r echo = FALSE, fig.align='center'}
 plot_correlation(German_credit, type= 'c', cor_args = list( 'use' = 'complete.obs'))
 ```
 
-There are little correlation between the continuous variables. We can notice that there is a correlation of 62% between the variable **DURATION** and **AMOOUNT**. This makes sense and is known by the bankers that the bigger the amount of credit, the longer the duration of the credit in months will last. 
+There are little correlation between the continuous variables. We can notice that there is a correlation of 62% between the variable **DURATION** and **AMOUNT**. This makes sense and is known by the bankers that the bigger the amount of credit, the longer the duration of the credit in months will last. 
 
 Correlation plot between categorical variables : 
-```{r echo = FALSE, message=FALSE, warning=FALSE}
+```{r echo = FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 plot_correlation(German_credit, type= 'd')
 ```
 
@@ -254,7 +257,7 @@ From this circle of correlations, we see that :
 + The second principal component PC2 is strongly positively correlated with **AGE**, **NUM_DEPENDENTS** and **NUM_CREDITS**. 
 
 
-From this biplot, we can see some characteristics of the observations.
+From the below biplot, we can see some characteristics of the observations.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=9,fig.height=7, out.width = "120%", fig.align="center"}
 fviz_pca_biplot(resultats_pca, repel = TRUE,
@@ -262,11 +265,11 @@ fviz_pca_biplot(resultats_pca, repel = TRUE,
                 habillage= German_credit$RESPONSE)
 ```
 
-Here, we can see the distribution of the response variables (0-1) according to the reduced dimension. What we can observe, is that the Bad credits: 0, look a little bit more positively correlated ot dimension 1. Therefore, more correlated to Amount and Duration. 
-Compared to Good Credits, it looks positively correlated to dimesion 2; **AGE**, **NUM_CREDITS**, **NUM_DEPENDENTS**.
+Here, we see the distribution of the response variables (0-1) according to the reduced dimension. What we can observe, is that the "Bad credits: 0", look a little bit more positively correlated to dimension 1. Therefore, more correlated to Amount and Duration. 
+Compared to Good Credits, it looks positively correlated to dimension 2; **AGE**, **NUM_CREDITS**, **NUM_DEPENDENTS**.
 
 
-After having cleaned the dataset and looked at all the different features, we created a new dataset that contains our modifications in order to use it for our analysis. 
+After having cleaned the dataset and looked at all the different features, we created a new dataset, named **GermandCredit_cleaned.csv**, that contains our modifications in order to use it for our analysis. 
 
 ```{r echo = FALSE}
 
