@@ -5,7 +5,7 @@ Data analytics for decision making project for the "Projects in Data Analytics f
 * Katia Voltz
 
 Project’s title : 
-# 
+# Report on the German Credit dataset 
 
 
 # Project structure 
@@ -15,6 +15,7 @@ It is divided in 6 files:
 - 'eda.Rmd' contains the exploratory data analysis of the cleaned dataset
 - 'analysis.Rmd' contains the analysis of our project. 
 - 'concl.Rmd' contains the conclusion and limitations of our project 
+  - The file 'concl.Rmd' cannot be knitted on its own as it includes the annexe part. In this section, some chunck code from others 'child' files are required. 
 - 'report.Rmd' is used to put our different parts of the project together. 
 
 # Use our code 
