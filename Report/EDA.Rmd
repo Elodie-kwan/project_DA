@@ -3,9 +3,9 @@ title: "Exploratory Data Analysis"
 author: "Elodie Kwan and Katia Voltz"
 date: '2022-04-26'
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -14,8 +14,10 @@ source(here::here("scripts/setup.R"))
 
 Our very first steps once we received the **German Credit data** was to dig into it and get to know the observations and features we were going to work with. 
 
-```{r include = FALSE}
+```{r chunck_reuse1, include = FALSE}
+## ----
 German_credit <- read.csv("./../Data_DA/GermanCredit.csv", header = TRUE, sep = ";")
+## ----
 ```
 
 
@@ -28,10 +30,12 @@ As said in the introduction, the German Credit data has data on 1000 observation
 
 We looked at the attribute Information :
 
-```{r echo = FALSE}
+```{r include=FALSE}
 str(German_credit)
+```
 
-summary(German_credit)
+```{r echo=FALSE}
+pander(summary(German_credit), split.tables = 200)
 ```
 
 We noticed that the variable **EDUCATION** has a minimum value of '-1' but it should be '0' since there are only 2 levels (0 and 1). Indeed, the observation 37 indicate a value of '-1' for **EDUCATION**. 
@@ -39,19 +43,23 @@ We notice another strange value, in the variable **GUARANTOR**, the maximum valu
 
 After discussion with the Banker, he gave us the correct values to these 2 mistakes. Observation 37 of **EDUCATION** and observation 234 of **GUARANTOR** should be equal to 1. We corrected these two values. 
 
-```{r echo = FALSE}
+```{r chunck_reuse2, echo = FALSE}
+## ----
 German_credit$EDUCATION[37] <- 1
 German_credit$EDUCATION <- as.factor(German_credit$EDUCATION)
 
 German_credit$GUARANTOR[234] <- 1
 German_credit$GUARANTOR <- as.factor(German_credit$GUARANTOR)
+## ----
 ```
 
 
 We also saw that the variable **AGE** has a maximum of 125. This is strange because it is very unlikely that someone lives to the age of 125. We talked to the banker again and he confirmed our doubts by telling us that a mistake has been made. At the observation 537, the correct age of the client is 75 years old. He asked us to correct this value in our data set. 
 
-```{r echo = FALSE}
+```{r chunck_reuse3, echo = FALSE}
+## ----
 German_credit$AGE[537] <- 75
+## ----
 ```
 
 
@@ -71,7 +79,8 @@ It is a dummy variable with 0/1.
 
 We had to make sure that the class of the variables are correct. As described above, all the variables are defined as *integer* but we know that we should have numerical and categorical variables in our dataset. Therefore, we have to transform the class of some of them.
 
-```{r echo = FALSE}
+```{r chunck_reuse4, echo = FALSE}
+## ----
 German_credit$DURATION <- as.numeric(German_credit$DURATION)
 German_credit$AMOUNT <- as.numeric(German_credit$AMOUNT)
 German_credit$INSTALL_RATE <- as.numeric(German_credit$INSTALL_RATE)
@@ -84,7 +93,11 @@ for (i in 1:ncol(German_credit)){
     German_credit[,i] <- factor(German_credit[,i])
     }
 }
+## ----
+```
 
+
+```{r echo=FALSE}
 str(German_credit)
 ```
 
@@ -93,9 +106,10 @@ The binomial data are set as factors and the others as numerical.
 
 We then described the variables one more time and we should get better results.  
 
-```{r echo = FALSE}
-describe(German_credit)
-introduce(German_credit)
+```{r echo = FALSE, fig.align='center'}
+Hmisc::describe(German_credit)
+
+pander(introduce(German_credit))
 
 plot_intro(German_credit)
 ```
@@ -106,7 +120,7 @@ The plot helps us to see the percentage of continuous variable, the percentage o
 ### Visualization of the data 
 First, we plot all the continuous variables into histograms and their corresponding density plots. 
 
-```{r echo = FALSE}
+```{r echo = FALSE, fig.show="hold", out.width="50%", fig.align='center'}
 plot_histogram(German_credit)
 plot_density(German_credit)
 ```
@@ -115,16 +129,16 @@ Our first notice is that the data are not really normally distributed. Some of t
 
 We can look at the tails and outliers more carefully through boxplots. 
 
-```{r echo = FALSE}
+```{r echo = FALSE, fig.align='center'}
 plot_boxplot(German_credit, by = 'RESPONSE',  ncol = 2,
              title = "Side-by-side boxplots")
 ```
 
 This seems not to be disturbing. It makes sense that only a few people has a big credit amount. However it seems that the 'bad' clients tends to ask for bigger credit amount than 'good' clients. 
 
-Now, we can make some barplots of the categorical variables.
+Then, we made some barplots of the categorical variables (appendix A).
 
-```{r echo = FALSE, fig.show="hold", out.width="50%"}
+```{r chunk_annex_1, include=FALSE, fig.show="hold", out.width="50%"}
 for (i in 1:ncol(German_credit)){
   if (class(German_credit[,i])=="factor"){
     print(ggplot(German_credit) +
@@ -136,7 +150,7 @@ for (i in 1:ncol(German_credit)){
 ```
 
 
-From those barplots we can see: 
+From these barplots we saw: 
 
 + The majority of people do not check their account status. (CHK_ACCT)
 + Most people have an average balance of less than < 100 DM in their saving account. (SAV_ACCT)

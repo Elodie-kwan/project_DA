@@ -5,6 +5,13 @@ output: html_document
 date: '2022-05-20'
 ---
 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+source(here::here("scripts/setup.R"))
+```
+
+```{r echo=FALSE}
+options(knitr.duplicate.label = 'allow')
+```
 
 ## Conclusion
 
@@ -13,4 +20,23 @@ As we saw the models could be improved as the accuracies are not going over the 
 
 ## References 
 
+
+
 ## Annexes 
+
+
+
+Appendix A : Barplots of the categorical variables from the EDA part. 
+
+```{r pick_reuse, ref.label=c('chunck_reuse1','chunck_reuse2','chunck_reuse3', 'chunck_reuse4'), include=FALSE}
+
+```
+
+```{r pick_annex_1, ref.label='chunk_annex_1', fig.show="hold", out.width="50%", echo = FALSE}
+
+```
+
+
+
+
+

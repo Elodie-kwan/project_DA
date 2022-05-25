@@ -32,3 +32,6 @@ xgboost
 caTools
 Matrix
 FactoMineR
+knitr
+kableExtra
+pander
