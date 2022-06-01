@@ -186,7 +186,7 @@ plot_correlation(German_credit, type= 'd')
 It is difficult to look at the correlation since there are a lot of variables on the graph. 
 We can still see higher correlation between **RESPONSE 1**: 
 
-+ and people that do not check their account (CHK_ACCT_3) 
++ and people that do not have check account (CHK_ACCT_3) 
 + and people that have a critical historical account (HISTORY_4)
 + and the variable _REAL_ESTATE_ (REAL_ESTATE)
 + and applicant that does not have their own property (PROP_UNKN_NONE_0)
