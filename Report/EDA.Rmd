@@ -155,7 +155,7 @@ for (i in 1:ncol(German_credit)){
 
 From these barplots we saw: 
 
-+ The majority of people do not check their account status. (CHK_ACCT)
++ The majority of people do not have a checking account. (CHK_ACCT)
 + Most people have an average balance of less than < 100 DM in their saving account. (SAV_ACCT)
 + Most of the applicants has its own residence. (OWN_RES)
 + Almost none of the applicants is a foreign worker. (FOREIGN) 
