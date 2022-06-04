@@ -40,6 +40,5 @@ The tasks required to perform our analysis is stated as follow.
   c) Fitting the models
   d) Accuracy study (scoring)
   e) Variable selection and importance
-  f) Cross-validation / Bootstrap
-  g) Final Best model 
+  f) Final Best model 
   
