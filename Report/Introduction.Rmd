@@ -8,11 +8,11 @@ output: pdf_document
 
 ## Executive Summary
 
-Data analysis is now a fundamental tool in the general understanding of business. In the current case, the objective would be to understand and profile the different historical and current customers of a bank, in order to better identify them. For this, we need to proceed in several steps: The first is to collect available data, check its relevance and see if it is accurate. Indeed, it is possible to deal with erroneous data. Therefore, it is necessary to check each feature and instance collected. The second step is to clean and understand the data in order to proceed to a more complete analysis. Finally, the goal is to answer the problem by using different analytical methods and synthesising the best model to provide a solution. 
+Data analysis is now a fundamental tool in the general understanding of business. In the current case, the objective would be to understand and profile the different historical and current customers of a bank, in order to better identify them. For this, we need to proceed in several steps: The first is to collect available data, check its relevance and see if it is accurate. Indeed, it is possible to deal with erroneous data. Therefore, it is necessary to verify each feature and instance collected. The second step is to clean and understand the data in order to proceed to a more complete analysis. Finally, the goal is to answer the problem by using different analytical methods and synthesising the best model to provide a solution. 
 
 
 ## Introduction 
-In the bank industry many bankers have to decid whether or not they should issue a loan to a new coming applicant. In this report, we will use the data set called **German Credit data** which was given to us. 
+In the bank industry many bankers have to decide whether or not they should issue a loan to a new coming applicant. In this report, we will use the data set called **German Credit data** which was given to us. 
 
 
 The German credit data set contains 1000 observations of past credit applicants, described by 30 variables. The applicants are described as **Good Credit** risk or **Bad Credit** risk: Therefore, the response variable, studied, is the credit rating. 

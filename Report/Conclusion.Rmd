@@ -34,7 +34,7 @@ As we saw the models could be improved as the accuracies are not going over the 
 + 2) CHK_ACCT : Checking account status 
   + 0 : < 0 DM 
   + 1 : 0 < · · · < 200 DM
-  + 2 : ≥ 200 DM
+  + 2 : >= 200 DM
   + 3 : no checking account
 + 3) DURATION : Duration of credit in months
 + 4) HISTORY : Credit history
@@ -58,16 +58,16 @@ As we saw the models could be improved as the accuracies are not going over the 
 + 11) AMOUNT : Credit amount
 + 12) SAV_ACCT : Average balance in savings account 
   + 0 : < 100 DM
-  + 1 : 100 ≤ · · · < 500 DM
-  + 2 : 500 ≤ · · · < 1000 DM
-  + 3 : ≥ 1000 DM
+  + 1 : 100 <=· · · < 500 DM
+  + 2 : 500 <= · · · < 1000 DM
+  + 3 : >= 1000 DM
   + 4 : unknown/no savings account
 + 13) EMPLOYMENT : Present employment since 
   + 0 : unemployed
   + 1 : < 1 year
-  + 2 : 1 ≤ · · · < 4 years
-  + 3 : 4 ≤ · · · < 7 years
-  + 4 : ≥ 7 years
+  + 2 : 1 <= · · · < 4 years
+  + 3 : 4 <= · · · < 7 years
+  + 4 : >= 7 years
 + 14) INSTALL_RATE : Installment rate as % of disposable income
 + 15) MALE_DIV : Applicant is male and divorced 
   + 0 : No, 1 : Yes
@@ -75,14 +75,14 @@ As we saw the models could be improved as the accuracies are not going over the 
   + 0 : No, 1 : Yes
 + 17) MALE_MAR_WID : Applicant is male and married or a widower
   + 0 : No, 1 : Yes
-+ 18) CO−APPLICANT : Application has a co-applicant 
++ 18) CO-APPLICANT : Application has a co-applicant 
   + 0 : No, 1 : Yes
 + 19) GUARANTOR : Applicant has a guarantor 
   + 0 : No, 1 : Yes
 + 20) PRESENT_RESIDENT : Present resident since - years 
-  + 0 : ≤ 1 year
-  + 1 : 1 < · · · ≤ 2 years
-  + 2 : 2 < · · · ≤ 3 years
+  + 0 : <= 1 year
+  + 1 : 1 < · · · <= 2 years
+  + 2 : 2 < · · · <= 3 years
   + 3 :> 4 years
 + 21) REAL_ESTATE : Applicant owns real estate
   + 0 : No, 1 : Yes
