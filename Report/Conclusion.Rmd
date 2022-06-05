@@ -23,7 +23,7 @@ Since several models has been performed throughout this analysis, we came up wit
 As we saw the models could be improved as the accuracies are not going over the 70%. We think that others variables describing better the 'Bad' credits could be added. For example, it would be interesting to know whether the applicant is under litigation for not paying back someone ('acte de poursuite' in French).
 
 ## References 
-
+ 
 
 
 ## Annexes 
