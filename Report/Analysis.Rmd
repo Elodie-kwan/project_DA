@@ -765,7 +765,9 @@ According to these two first tables, the best model would be the "Radial base li
 
 The accuracy means that out of total number of observations, the model predicted correctly 70% of them. The Cohen’s Kappa Coefficient means that there is 36% of agreement, indicating that the raters agree in their classification for 36% of the cases. 
 
-We also remember that the model was almost better than the other models when it came to predict the "Bad credit" cases. Although the model remains quite poor at predicting them since only half of the predicted ones are correct. 
+We also remember that the model was almost better than the other models when it came to predict the "Bad credit" cases. Although the model remains quite poor at predicting them since only half of the predicted ones are correct. Indeed, 52 "Good credits" were wrongly rejected out of 250 applicants (52 false negatives). This means that we misjudge at least 1 out of 5 applicants. This is a type I error as a statistical inference. 
+
+
 
 Another table is done to compare the KNN because they were not performed on the balanced dataset. 
 
