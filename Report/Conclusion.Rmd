@@ -17,7 +17,10 @@ options(knitr.duplicate.label = 'allow')
 
 Recall, we computed several models. We first started with three versions of the classification tree, then we performed two logistic regression, two nearest neighbor, four support vector machines, one neural network and one gradient boosting model. Through all these models we noticed a common point which was their poor ability to predict the "Bad credit" cases. Knowing the purpose of this report, it is not really good as the banker might then misjudge the new applicant and refuse to give a credit while the applicant might be a good one. This will result in an opportunity loss for our client, the banker. 
 
+At the present time the variable that seems to be necessary for classification is **Checking account**. The fact that this variable predominates over the others may serve to simplify the determination model for Good or Bad credit risk. However, it should be kept in mind that the database is unbalanced in favour of bad credits, which makes it difficult to know the real cause of their default. In order to be able to apply models that know the cause and not the correlation between risky credits and client profiles, we recommend to collect more data on them. 
+
 Since several models has been performed throughout this analysis, we came up with the conclusion that there might be a bias in the data itself. Indeed we might have good information and knowledge on the characteristics of a "good" applicant but the data could be improved and include more information on the "bad" applicant. This way, the models will then be able to be better trained. 
+
 
 ### Our recommendations/Suggestions 
 As we saw the models could be improved as the accuracies are not going over the 70%. We think that others variables describing better the 'Bad' credits could be added. For example, it would be interesting to know whether the applicant is under litigation for not paying back someone ('acte de poursuite' in French).
