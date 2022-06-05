@@ -3,8 +3,8 @@ title: "Analysis"
 author: "Elodie Kwan and Katia Voltz"
 date: '2022-04-26'
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -53,7 +53,6 @@ German_credit.te <- German_credit_cleaned[-index.tr,-1]
 
 Then, we applied the balancing data technique in order to improve the predictions of **Good Credit** and **Bad Credit**, since we have more observations on the **Good Credit**.
 
-The table below reveals the unbalanced problem.
 
 ```{r include=FALSE}
 ## Statistics on the training set
@@ -65,6 +64,7 @@ Since there are many more "Good Credit" than "Bad Credit", any model favors the 
 
 
 #### Sub-sampling
+
 Balancing using sub-sampling consists of taking all the cases in the smallest class (here “Bad Credit”) and extract at random the same amount of cases in the largest category (here “Good”).
 
 ```{r include = FALSE}
@@ -95,7 +95,7 @@ The **training set** is now balanced, we have 223 observations for both "Good Cr
 Once we had our training set and test set, we could fit some models and compare them with together to choose the best model. 
 
 #### 1. Classification Tree (Decision Tree)
-
+<br>
 We first started with a decision tree and more specifically we chose the classification tree as we want to classify the applicants. The model was build on our previously balanced training set `German_Credit.tr.subs`. We used the R function `rpart`. 
 
 ```{r include = FALSE}
@@ -110,6 +110,7 @@ rpart.plot(german.ct)
 ```
 
 We could see that among the 31 explanatory variables, this model uses 6 of them: **CHK_ACCT**, **AMOUNT**, **HISTORY**, **DURATION**, **GUARANTOR** and **EMPLOYMENT**. 
+
 ```{r echo = FALSE}
 german.bigct.prediction <- predict(german.ct, 
                                    newdata=German_credit.te,
@@ -127,6 +128,7 @@ cm_bigct$byClass
 
 ```
 
+<br>
 We first have an insight on how well it predict the test set (`German_credit.te`
 ). We recall that 0 means a "Bad Credit" risk and 1 means a "Good Credit" risk. It seems that this model has difficulty to predict the "Bad Credit" risk applicants. Indeed from the table have 70 observations that were misclassified as being "Bad credit" while it was in fact a "Good credit". 
 
@@ -209,8 +211,8 @@ cm_ctautoprune$byClass
 Again, it seems that in general the classification trees we perfomed have difficulty to predict the "Bad credit" cases. 
 
 ##### Variable importance of the classification tree 
-
-Then we analysed the variable importance of one of the models. We decided to compute the variable importance of the **pruned classisication tree** `german.ct.prune` by applying the function `varImp` on the model. 
+<br>
+Then we analysed the variable importance of one of the models. We decided to compute the variable importance of the **pruned classification tree** `german.ct.prune` by applying the function `varImp` on the model. 
 
 ```{r include=FALSE}
 varImp(german.ct.prune)
@@ -230,7 +232,7 @@ The variable **CHK_ACCT** and **HISTORY** were already noticed though.
 
 
 #### 2. Logistic Regression  
-
+<br> 
 The next model we performed is a logistic regression. 
 ```{r echo=FALSE}
 
@@ -260,10 +262,10 @@ pander(cm_logreg$table,
 cm_logreg$byClass
 ```
 
-From the confusion matrix, we see again the the model has difficulty to predict the "Bad credit" althought the wronged classified amount of observation is lower when it comes to the "Bad credit" one.
+From the confusion matrix, we see again the the model has difficulty to predict the "Bad credit" although the wronged classified amount of observation is lower when it comes to the "Bad credit" one.
 
 ##### Variable selection and interpretation with step method (AIC criteria)
-
+<br>
 In order to reduce the logistic regression we used a stepwise variable selection. This has been done with the command `step`. 
 
 ```{r include = FALSE}
@@ -280,7 +282,8 @@ The variables that have been removed are : **FURNITURE**, **RADIO.TV**, **EDUCAT
 
 In the end, we get the most significant model: 
 
-$$ RESPONSE = -0.6339113 + 0.5970566 * CHK_{ACCT1} + 1.1123874 * CHK_{ACCT2} +
+$$ 
+RESPONSE = -0.6339113 + 0.5970566 * CHK_{ACCT1} + 1.1123874 * CHK_{ACCT2} + \\
 2.4109175 * CHK_{ACCT3} - 0.6393459 * HISTORY1 + 0.3153810 * HISTORY2 \\
 + 0.0245812 * HISTORY3 + 1.0638624 * HISTORY4 - 0.7159178 * NEW_{CAR1} \\
 + 1.3489217 * USED_{CAR1}  -0.8489518 * RETRAINING1 - 0.0002631 * AMOUNT \\
@@ -290,9 +293,14 @@ $$ RESPONSE = -0.6339113 + 0.5970566 * CHK_{ACCT1} + 1.1123874 * CHK_{ACCT2} +
 + 1.6927223 * GUARANTOR1 - 1.1117822 * PRESENT_{RESIDENT2} \\
 - 0.3408387 * PRESENT_{RESIDENT3} - 0.7613632 * PRESENT_{RESIDENT4} \\
 - 1.0532655 * PROP_{UNKN_NONE1} + 0.0181856 * AGE - 0.6281982 * OTHER_{INSTALL1} \\
-- 0.8736712 * RENT1 + 0.5251823 * TELEPHONE + 1.2896516 * FOREIGN $$
+- 0.8736712 * RENT1 + 0.5251823 * TELEPHONE + 1.2896516 * FOREIGN 
+$$
 
-$$ p = (e^{RESPONSE})/(1 + e^{RESPONSE})$$
+<br> 
+
+$$ 
+p = (e^{RESPONSE})/(1 + e^{RESPONSE})
+$$
 
 It means that : 
 
@@ -338,6 +346,7 @@ cm_logregsel$byClass
 From this point we might think that the problem for the difficulty to predict the "Bad Credit" cases is not due to the models but rather the data itself. We might still want to perfom other models to make sure of our intuition.
 
 ##### Variable importance for logistic regression
+<br> 
 
 ```{r include=FALSE}
 x_train <- select(German_Credit.tr.subs, -RESPONSE)
@@ -352,19 +361,19 @@ explainer_logreg <- explain(model = mod.logreg.sel,
 importance_logreg  <- calculate_importance(explainer_logreg)
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
 plot(importance_logreg)
 ```
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.align='center'}
 vip(mod.logreg.sel)
 ```
 
 Listed above are the most important variables for the logarithmic regression we reduced. Here again, the **CHK_ACCT** variable differentiate itself from the others in term of importance in the model prediction. 
 
 #### 3.a K-Nearest Neighbor (K=2)
-
+<br> 
 To perform a k-nearest neighbor method, we do not need to balance the data so we will use the unbalanced training set.
 
 We first try to model it using a 2-NN (with Euclidean distance).
@@ -404,6 +413,7 @@ So again, this model also have difficulties to predict the "Bad Credit" cases.
 The prediction is not perfect. We need to try to improve the prediction by changing K at that point. Therefore, we use K=3.
 
 #### 3.b K-Nearest Neighbor (K=3)
+
 ```{r echo=FALSE}
 set.seed(123)
 # applying Knn model with k = 3 on the training set
@@ -435,7 +445,7 @@ The table is read as follow :
 Again it seems not to have improved anything, the **F-measure** even seems to have decreased a little bit.
 
 #### 4. Linear Support Vector Machine
-
+<br>
 The next model is the linear Support Vector Machine. 
 
 ```{r echo=FALSE}
@@ -461,7 +471,7 @@ This model seems to have improved a little bit our ability to predict the "Bad C
 
 
 ##### Tunning the hyperparameters of Linear SVM
-
+<br> 
 We want to select the good hyperparameters for our linear SVM.
 
 ```{r echo=FALSE}
@@ -476,8 +486,9 @@ svm_Linear <- train(RESPONSE ~., data = German_Credit.tr.subs, method = "svmLine
 svm_Linear
 ```
 
+<br> 
 We see that we have a good accuracy (0.72). 
-
+<br> 
 
 ```{r cache = TRUE, echo = FALSE, fig.align='center'}
 grid <- expand.grid(C = c(0.01, 0.1, 1, 10, 100, 1000))
@@ -708,19 +719,19 @@ Once all the models were modelized we compared them according to their scores an
 
 
 ```{r echo=FALSE}
-models_stat <- cbind(cm_bigct$overall,
-                     cm_ctprune$overall,
-                     cm_ctautoprune$overall,
-                     cm_logreg$overall,
-                     cm_logregsel$overall,
+models_stat <- cbind(append(cm_bigct$overall, cm_bigct$byClass[11]),
+                     append(cm_ctprune$overall, cm_ctprune$byClass[11]),
+                     append(cm_ctautoprune$overall, cm_ctautoprune$byClass[11]),
+                     append(cm_logreg$overall, cm_logreg$byClass[11]),
+                     append(cm_logregsel$overall, cm_logregsel$byClass[11]),
                      # cm_knn2$overall,
                      # cm_knn3$overall,
-                     cm_linearsvm$overall,
-                     cm_linearsvm_tuned$overall,
-                     cm_rbsvm$overall,
-                     cm_rbsvm_tuned$overall,
-                     cm_nn3$overall,
-                     cm_xgb$overall
+                     append(cm_linearsvm$overall, cm_linearsvm$byClass[11]),
+                     append(cm_linearsvm_tuned$overall, cm_linearsvm_tuned$byClass[11]),
+                     append(cm_rbsvm$overall, cm_rbsvm$byClass[11]),
+                     append(cm_rbsvm_tuned$overall, cm_rbsvm_tuned$byClass[11]),
+                     append(cm_nn3$overall, cm_nn3$byClass[11]),
+                     append(cm_xgb$overall, cm_xgb$byClass[11])
                      )
 
 colnames(models_stat) <- c("Big classification tree", 
@@ -740,7 +751,7 @@ colnames(models_stat) <- c("Big classification tree",
 
 rownames(models_stat) <- c("Accuracy", "Kappa", "Accuracy lower bound", 
                            "Accuracy upper bound", "Accuracy null", 
-                           "Accuracy P-value", "Mcnemar P-value")
+                           "Accuracy P-value", "Mcnemar P-value", "Balanced Accuracy")
 
 pander(models_stat, digits = 4, split.table = 190,
        caption = "Scores of the models") 

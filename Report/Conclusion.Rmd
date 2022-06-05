@@ -112,6 +112,8 @@ As we saw the models could be improved as the accuracies are not going over the 
 
 #### Appendix B : Barplots of the categorical variables from the EDA part. 
 
+<\br> 
+
 ```{r pick_reuse, ref.label=c('chunck_reuse1','chunck_reuse2','chunck_reuse3', 'chunck_reuse4'), include=FALSE}
 
 ```
