@@ -481,13 +481,14 @@ German_Credit.trctrl <- trainControl(method = "cv", number=10)
 
 ```{r echo=FALSE}
 set.seed(143)
-svm_Linear <- train(RESPONSE ~., data = German_Credit.tr.subs, method = "svmLinear",
+svm_Linear <- train(RESPONSE ~., data = German_Credit.tr.subs, 
+                    method = "svmLinear",
                     trControl=German_Credit.trctrl)
 svm_Linear
 ```
 
 <br> 
-We see that we have a good accuracy (0.72). 
+We see that we have a good cross-validation accuracy (0.72). 
 <br> 
 
 ```{r cache = TRUE, echo = FALSE, fig.align='center'}
@@ -528,6 +529,7 @@ The Linear support vector models are not too bad in the sense that they are bett
 
 
 #### 5. Radial Basis Support Vector Machine
+<br>
 We try now with a radial basis kernel (the default).
 
 ```{r echo=FALSE}
@@ -600,7 +602,7 @@ The model seems to be well balanced and it has good scores. The F-measure is qui
 
 
 #### 6. Neural Network - Simple hyperparameter tuning
-
+<br>
 To select the good parameters, we build a search grid and fit the model with each possible value in the grid. This is brute force and time consuming. The best model is selected among all the possible choices.
 
 ```{r cache = TRUE, message = FALSE, warning = FALSE, results = 'hide', echo=FALSE}
@@ -648,7 +650,7 @@ cm_nn3$byClass
 We see that this Neural Network competes quite close to the support vector machines ones. Almost half of the "Bad credit" cases that it has predicted are correct. 
 
 #### 7. Gradient Boosting 
-
+<br>
 The Gradient Boosting model accepts only numerical values so we have some transformation to do on our data in order to use it. 
 
 ```{r echo = FALSE}
