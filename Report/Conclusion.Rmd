@@ -37,6 +37,8 @@ As we saw the models could be improved as the accuracies are not going over the 
 
 ## References 
 
+German_Credit database / Projects in Data Analytics for Decision Making 2021-2022 / Machine Learning 2021-2022
+
 ## Annexes 
 
 #### Appendix A : Definitions of the attributes of the German Credit dataset 
