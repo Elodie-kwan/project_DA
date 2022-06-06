@@ -33,11 +33,9 @@ Since several models has been performed throughout this analysis, we came up wit
 
 
 ### Our recommendations/Suggestions 
-As we saw the models could be improved as the accuracies are not going over the 70%. We think that others variables describing better the 'Bad' credits could be added. For example, it would be interesting to know whether the applicant is under litigation for not paying back someone ('acte de poursuite' in French). 
+As we saw the models could be improved as the accuracies are not going over the 70%. We think that others variables describing better the 'Bad' credits could be added. For example, it would be interesting to know whether the applicant is under litigation for not paying back someone ('acte de poursuite' in French). We also saw that not holding a checking account CHK_ACCT = 3 had an impact on being a good credit. This seems to be a quite surprising classification. We therefore recommend to collect another data variable: Has another account in another bank.To speak more generally, we recommend to collect data that could directly represent 'Bad' credit, such as the lawsuit variable or the monthly income.
 
 ## References 
- 
-
 
 ## Annexes 
 
