@@ -31,7 +31,7 @@ More specifically, the **sensitivity** in our report represent the **True 'Bad C
 
 The **specificity** in this report represents the **True 'Good Credits' rate**. For SVM it is equal to 69.94%. 
 
-The goal aslo for the banker is not to loan to a 'Bad credits' that he classified initially as a 'Good credit'. It means that as an indicator of model selection it would be intersting to go for the model that has the highest specificity. And thus prioritize the **True 'Good Credits' rate**.
+The goal aslo for the banker is not to loan to a 'Bad credits' that he classified initially as a 'Good credit'. With this indicator it would be intersting to go for the model that has the highest specificity. And thus prioritize the **True 'Good Credits' rate**.
 
 At the present time the variable that seems to be necessary for classification is **Checking account**. The fact that this variable predominates over the others may serve to simplify the determination model for Good or Bad credit risk. However, it should be kept in mind that the database is unbalanced in favour of Good credits, which makes difficult to know the real cause of the Bad credits default. In order to be able to apply models that know the cause and not the correlation between risky credits and client profiles, we recommend to collect more data on them. 
 
