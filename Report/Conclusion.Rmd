@@ -25,7 +25,13 @@ Regarding the choice of the best classification model, it is obvious that SVM ra
 
 ## Conclusion
 
-Recall, we computed several models. We first started with three versions of the classification tree, then we performed two logistic regression, two nearest neighbor, four support vector machines, one neural network and one gradient boosting model. Through all these models we noticed a common point which was their poor ability to predict the "Bad credit" cases. Knowing the purpose of this report, it is not really good as the banker might then misjudge the new applicant and refuse to give a credit while the applicant might be a good one. This will result in an opportunity loss for our client, the banker. 
+Recall, we computed several models. We first started with three versions of the classification tree, then we performed two logistic regression, two nearest neighbor, four support vector machines, one neural network and one gradient boosting model. Through all these models we noticed a common point which was their poor ability to predict the "Bad credit" cases. Knowing the purpose of this report, it is not really good as the banker might then misjudge the new applicant and refuse to give a credit while the applicant might be a good one. This will result in an opportunity loss for our client, and the banker. 
+
+More specifically, the **sensitivity** in our report represent the **True 'Bad Credits' rate**, for SVM it is of 70.13%. 
+
+The **specificity** in this report represents the **True 'Good Credits' rate**. For SVM it is equal to 69.94%. 
+
+The goal aslo for the banker is not to loan to a 'Bad credits' that he classified initially as a 'Good credit'. It means that as an indicator of model selection it would be intersting to go for the model that has the highest specificity. And thus prioritize the **True 'Good Credits' rate**.
 
 At the present time the variable that seems to be necessary for classification is **Checking account**. The fact that this variable predominates over the others may serve to simplify the determination model for Good or Bad credit risk. However, it should be kept in mind that the database is unbalanced in favour of Good credits, which makes difficult to know the real cause of the Bad credits default. In order to be able to apply models that know the cause and not the correlation between risky credits and client profiles, we recommend to collect more data on them. 
 
