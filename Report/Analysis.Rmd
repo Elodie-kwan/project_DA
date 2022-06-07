@@ -429,7 +429,7 @@ German_credit.knn3.tr.pred <- predict(German_credit.knn3.tr,
 cm_knn3 <- confusionMatrix(data=German_credit.knn3.tr.pred,
                            reference = German_credit.te$RESPONSE)
 
-pander(cm_bigct$table, 
+pander(cm_knn3$table, 
        caption = "Confusion Matrix of the 3-Nearest neighbor",
        row.names = c("Bad credit risk", "Good credit risk"),
        col.names = c("Bad credit risk", "Good credit risk"))
