@@ -201,7 +201,7 @@ cm_ctautoprune <- confusionMatrix(data=german.ct.autoprune.prediction,
                                   reference = German_credit.te$RESPONSE)
 
 pander(cm_ctautoprune$table, 
-       caption = "Confusion Matrix of the Autoruned classification tree",
+       caption = "Confusion Matrix of the Autopruned classification tree",
        row.names = c("Bad credit risk", "Good credit risk"),
        col.names = c("Bad credit risk", "Good credit risk"))
 
